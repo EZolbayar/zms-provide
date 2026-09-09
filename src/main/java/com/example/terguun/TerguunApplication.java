@@ -1,13 +1,13 @@
-package com.example.zms_upload;
+package com.example.terguun;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ZmsUploadApplication {
+public class TerguunApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ZmsUploadApplication.class, args);
+		SpringApplication.run(TerguunApplication.class, args);
 	}
 
 }

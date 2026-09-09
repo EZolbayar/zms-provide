@@ -1,4 +1,4 @@
-package com.example.zms_upload.user;
+package com.example.terguun.user;
 
 import java.io.Serializable;
 import java.util.Objects;

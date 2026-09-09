@@ -1,4 +1,4 @@
-package com.example.zms_upload.user;
+package com.example.terguun.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
