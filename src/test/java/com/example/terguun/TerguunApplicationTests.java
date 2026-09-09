@@ -1,10 +1,10 @@
-package com.example.zms_upload;
+package com.example.terguun;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ZmsUploadApplicationTests {
+class TerguunApplicationTests {
 
 	@Test
 	void contextLoads() {
