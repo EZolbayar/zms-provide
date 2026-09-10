@@ -1,6 +1,6 @@
 package com.example.terguun.service;
 
-import com.example.terguun.dto.CitizenUploadRequestDto;
+import com.example.terguun.dto.sain.CitizenUploadRequestDto;
 
 public interface CitizenUploadService {
 

@@ -1,4 +1,4 @@
-package com.example.terguun.dto;
+package com.example.terguun.dto.sain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

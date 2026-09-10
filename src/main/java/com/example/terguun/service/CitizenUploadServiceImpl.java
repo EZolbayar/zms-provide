@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.terguun.dto.CitizenUploadRequestDto;
-import com.example.terguun.dto.CustomerAddressDto;
-import com.example.terguun.dto.CustomerBankRelationDto;
-import com.example.terguun.dto.CustomerDataDto;
+import com.example.terguun.dto.sain.CitizenUploadRequestDto;
+import com.example.terguun.dto.sain.CustomerAddressDto;
+import com.example.terguun.dto.sain.CustomerBankRelationDto;
+import com.example.terguun.dto.sain.CustomerDataDto;
 import com.example.terguun.exception.ResourceNotFoundException;
 import com.example.terguun.model.Account;
 import com.example.terguun.model.Client;
