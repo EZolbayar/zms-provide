@@ -18,7 +18,7 @@ public class SainTokenService {
 
     private final SainTokenClient sainClient;
 
-    @Value("${sain.usernamee}")
+    @Value("${sain.username}")
     private String username;
 
     @Value("${sain.password}")
@@ -26,7 +26,6 @@ public class SainTokenService {
 
     private final AtomicReference<String> cachedToken = new AtomicReference<>();
 
-    // Feign RequestInterceptor-оос дуудагдана, токен кэшлэгдсэн бол дахин login хийхгүй.
     public String getToken() {
         String token = cachedToken.get();
         if (token == null) {

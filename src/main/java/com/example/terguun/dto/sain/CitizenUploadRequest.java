@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CitizenUploadRequestDto {
+public class CitizenUploadRequest {
 
     @JsonProperty("patch_number")
     private String patchNumber;
@@ -25,5 +25,5 @@ public class CitizenUploadRequestDto {
     private String dataProviderBranch;
 
     @JsonProperty("customer_data")
-    private List<CustomerDataDto> customerData;
+    private List<CustomerData> customerData;
 }

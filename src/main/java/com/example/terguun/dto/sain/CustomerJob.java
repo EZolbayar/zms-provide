@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerJobDto {
+public class CustomerJob {
 
     @JsonProperty("c_job_position")
     private String position;

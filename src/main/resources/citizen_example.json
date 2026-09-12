@@ -1,0 +1,210 @@
+{
+  "patch_number": "",
+  "data_provider_regnum": "",
+  "data_provider_branch": "",
+  "customer_data": [
+    {
+      "action": "",
+      "c_civil_id": "",
+      "o_c_regnum": "",
+      "o_c_customer_name": "",
+      "c_lastname": "",
+      "c_familyname": "",
+      "o_c_isforeign": "",
+      "o_c_birthdate": "",
+      "o_c_address": {
+        "o_c_address_full": "",
+        "o_c_address_aimag_city_name": "",
+        "o_c_address_aimag_city_code": "",
+        "o_c_address_soum_district_name": "",
+        "o_c_address_soum_district_code": "",
+        "o_c_address_bag_khoroo_name": "",
+        "o_c_address_bag_khoroo_code": "",
+        "o_c_address_street_name": "",
+        "o_c_address_region_name": "",
+        "o_c_address_town_name": "",
+        "o_c_address_apartment_name_number": "",
+        "o_c_address_zipcode": ""
+      },
+      "o_c_phone": "",
+      "o_c_email": "",
+      "c_tax_number": "",
+      "c_family_numof_members": "",
+      "c_family_numof_unemployed": "",
+      "c_isemployed": "",
+      "c_job": {
+        "c_job_position": "",
+        "c_job_name": "",
+        "c_job_address": "",
+        "c_job_phone": "",
+        "c_job_mail": ""
+      },
+      "o_c_related_org": [
+        {
+          "action": "",
+          "o_c_related_org_index": "",
+          "o_c_related_org_name": "",
+          "o_c_related_org_isforeign": "",
+          "o_c_related_org_regnum": "",
+          "o_c_related_org_state_regnum": "",
+          "o_c_related_org_relation": "",
+          "o_c_related_org_isfinancial_onus": ""
+        }
+      ],
+      "o_c_related_customer": [
+        {
+          "action": "",
+          "o_c_related_customer_index": "",
+          "o_c_related_customer_firstname": "",
+          "o_c_related_customer_lastname": "",
+          "o_c_related_customer_familyname": "",
+          "o_c_related_customer_isforeign": "",
+          "o_c_related_customer_civil_id": "",
+          "o_c_related_customer_regnum": "",
+          "o_c_related_customer_relation": "",
+          "o_c_related_customer_isfinancial_onus": ""
+        }
+      ],
+      "o_c_customer_bank_relation": {
+        "action": "",
+        "relation": ""
+      },
+      "o_c_loan_information": [
+        {
+          "action": "",
+          "o_c_loan_contract_date": "",
+          "o_c_loan_contractno": "",
+          "o_c_loan_contract_change_reason": "",
+          "o_c_loan_collateral_indexes": [],
+          "o_c_loan_related_org_indexes": [],
+          "o_c_loan_related_customer_indexes": [],
+          "o_c_loan_amount_lcy": "",
+          "o_c_loan_amount_fcy": "",
+          "o_c_loan_balance_lcy": "",
+          "o_c_loan_balance_fcy": "",
+          "o_c_loan_interest_balance_lcy": "",
+          "o_c_loan_interest_balance_fcy": "",
+          "o_c_loan_additional_interest_balance_lcy": "",
+          "o_c_loan_additional_interest_balance_fcy": "",
+          "o_c_loan_currency_rate": "",
+          "o_c_loan_loan_provenance": "",
+          "o_c_loan_bond_market": "",
+          "o_c_loan_numof_bonds": "",
+          "o_c_loan_bond_unit_price": "",
+          "o_c_loan_starteddate": "",
+          "o_c_loan_expdate": "",
+          "o_c_loan_status": "",
+          "o_c_loan_decide_status": "",
+          "o_c_loan_paiddate": "",
+          "o_c_loan_currency": "",
+          "o_c_loan_sector": "",
+          "o_c_loan_interest_rate": "",
+          "o_c_loan_additional_interest_rate": "",
+          "o_c_loan_commission": "",
+          "o_c_loan_fee": "",
+          "o_c_loan_class": "",
+          "o_c_loan_type": "",
+          "o_c_loan_line_contractno": "",
+          "o_c_loan_description": "",
+          "o_c_loan_transactions": {
+            "o_c_loan_schedule_type": "",
+            "o_c_loan_schedule_status": "",
+            "o_c_loan_schedule_change_reason": "",
+            "o_c_loan_schedule": [
+              {
+                "action": "",
+                "o_c_schedule_due_date": "",
+                "o_c_schedule_principal": "",
+                "o_c_schedule_interest": "",
+                "o_c_schedule_additional": "",
+                "o_c_schedule_balance": ""
+              }
+            ],
+            "o_c_loan_payment": [
+              {
+                "action": "",
+                "o_c_payment_date": "",
+                "o_c_payment_due_date": "",
+                "o_c_payment_principal": "",
+                "o_c_payment_interest": "",
+                "o_c_payment_additional": ""
+              }
+            ]
+          }
+        }
+      ],
+      "o_c_loanline": [
+        {
+          "action": "",
+          "o_c_loanline_contract_date": "",
+          "o_c_loanline_contractno": "",
+          "o_c_loanline_contract_change_reason": "",
+          "o_c_loanline_collateral_indexes": [],
+          "o_c_loanline_type": "",
+          "o_c_loanline_amount_lcy": "",
+          "o_c_loanline_amount_fcy": "",
+          "o_c_loanline_starteddate": "",
+          "o_c_loanline_expdate": "",
+          "o_c_loanline_currency": "",
+          "o_c_loanline_currency_rate": "",
+          "o_c_loanline_sector": "",
+          "o_c_loanline_interest_rate": "",
+          "o_c_loanline_commitment_interest_rate": "",
+          "o_c_loanline_description": "",
+          "o_c_loanline_balance_lcy": "",
+          "o_c_loanline_balance_fcy": "",
+          "o_c_loanline_paiddate": "",
+          "o_c_loanline_status": ""
+        }
+      ],
+      "o_c_coll_information": [
+        {
+          "action": "",
+          "o_c_coll_index": "",
+          "o_c_coll_contractno": "",
+          "o_c_coll_internalno": "",
+          "o_c_coll_type": "",
+          "o_c_coll_description": "",
+          "o_c_coll_valuation_date": "",
+          "o_c_coll_value": "",
+          "o_c_coll_max_value": "",
+          "o_c_coll_address": "",
+          "o_c_coll_zipcode": "",
+          "o_c_coll_is_real_estate": "",
+          "o_c_coll_state_registration": {
+            "o_c_coll_certificateno": "",
+            "o_c_coll_state_regnum": "",
+            "o_c_coll_registered_date": "",
+            "o_c_coll_confirmed_date": ""
+          },
+          "o_c_coll_other_registration": {
+            "o_c_coll_other_certificateno": "",
+            "o_c_coll_other_regnum": "",
+            "o_c_coll_other_name": "",
+            "o_c_coll_other_registered_date": ""
+          },
+          "o_c_coll_customer": [
+            {
+              "action": "",
+              "o_c_coll_customer_firstname": "",
+              "o_c_coll_customer_lastname": "",
+              "o_c_coll_customer_familyname": "",
+              "o_c_coll_customer_isforeign": "",
+              "o_c_coll_customer_civil_id": "",
+              "o_c_coll_customer_regnum": ""
+            }
+          ],
+          "o_c_coll_org": [
+            {
+              "action": "",
+              "o_c_coll_org_name": "",
+              "o_c_coll_org_isforeign": "",
+              "o_c_coll_org_regnum": "",
+              "o_c_coll_org_state_regnum": ""
+            }
+          ]
+        }
+        ]
+    }
+  ]
+}

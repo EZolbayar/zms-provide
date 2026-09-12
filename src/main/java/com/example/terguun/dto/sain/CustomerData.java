@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerDataDto {
+public class CustomerData {
 
     private String action;
 
@@ -39,7 +39,7 @@ public class CustomerDataDto {
     private LocalDate birthdate;
 
     @JsonProperty("o_c_address")
-    private CustomerAddressDto address;
+    private CustomerAddress address;
 
     @JsonProperty("o_c_phone")
     private String phone;
@@ -60,8 +60,23 @@ public class CustomerDataDto {
     private Integer isEmployed;
 
     @JsonProperty("c_job")
-    private CustomerJobDto job;
+    private CustomerJob job;
+
+    @JsonProperty("o_c_related_org")
+    private RelatedOrg relatedOrg;
+
+    @JsonProperty("o_c_related_customer")
+    private RelatedCustomer relatedCustomer;
 
     @JsonProperty("o_c_customer_bank_relation")
-    private CustomerBankRelationDto bankRelation;
+    private CustomerBankRelation bankRelation;
+
+    @JsonProperty("o_c_loan_information")
+    private LoanInformation loanInformation;
+
+    @JsonProperty("o_c_loanline")
+    private LoanLineData loanLineData;
+
+    @JsonProperty("o_c_coll_information")
+    private CollateralInformation collateralInformation;
 }

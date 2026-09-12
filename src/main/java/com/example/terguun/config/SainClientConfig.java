@@ -2,6 +2,7 @@ package com.example.terguun.config;
 
 import java.time.Duration;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,13 +37,13 @@ public class SainClientConfig {
     }
 
     @Bean(name = "sainAuthRequestInterceptor")
-    RequestInterceptor sainAuthRequestInterceptor(SainTokenService sainTokenService) {
+    RequestInterceptor sainAuthRequestInterceptor(ObjectProvider<SainTokenService> sainTokenService) {
         return requestTemplate -> {
-            // Login дуудлагад Bearer token нэмэхгүй, эс тэгвээс токен авах үед мөнхөд эргэлдэнэ.
+            
             if (requestTemplate.url() != null && requestTemplate.url().contains(loginPath)) {
                 return;
             }
-            requestTemplate.header("Authorization", "Bearer " + sainTokenService.getToken());
+            requestTemplate.header("Authorization", "Bearer " + sainTokenService.getObject().getToken());
         };
     }
 

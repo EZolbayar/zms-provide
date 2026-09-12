@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerBankRelationDto {
+public class CustomerBankRelation {
 
     private String action;
     private String relation;

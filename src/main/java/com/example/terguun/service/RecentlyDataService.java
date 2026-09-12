@@ -1,15 +1,16 @@
 package com.example.terguun.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.terguun.dto.sain.CitizenUploadRequestDto;
-import com.example.terguun.dto.sain.CustomerAddressDto;
-import com.example.terguun.dto.sain.CustomerBankRelationDto;
-import com.example.terguun.dto.sain.CustomerDataDto;
+import com.example.terguun.dto.sain.CitizenUploadRequest;
+import com.example.terguun.dto.sain.CustomerAddress;
+import com.example.terguun.dto.sain.CustomerBankRelation;
+import com.example.terguun.dto.sain.CustomerData;
 import com.example.terguun.exception.ResourceNotFoundException;
 import com.example.terguun.model.Account;
 import com.example.terguun.model.Client;
@@ -22,31 +23,47 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CitizenUploadServiceImpl implements CitizenUploadService {
+public class RecentlyDataService {
+
+    @Value("${look.back.hours}")
+    private int lookbackHours;
 
     private final ClientRepository clientRepository;
     private final AccountRepository accountRepository;
     private final LoanInstallmentRepository loanInstallmentRepository;
 
-    @Value("${sain.data-provider-regnum}")
+    @Value("${data.provider.regnum}")
     private String dataProviderRegnum;
 
-    @Value("${sain.data-provider-branch}")
+    @Value("${data.provider.branch}")
     private String dataProviderBranch;
 
-    @Override
-    public CitizenUploadRequestDto buildForClient(Long clientId) {
+    public List<CitizenUploadRequest> buildForRecentlyChangedAccounts() {
+        LocalDateTime since = LocalDateTime.now().minusHours(lookbackHours);
+
+        List<Account> recentAccounts = accountRepository.findByCreatedOnAfterOrModifiedOnAfter(since, since);
+
+        List<Long> clientIds = recentAccounts.stream()
+                .map(Account::getClientId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        return clientIds.stream()
+                .map(this::buildForClient)
+                .collect(Collectors.toList());
+    }
+
+    private CitizenUploadRequest buildForClient(Long clientId) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Client олдсонгүй, id: " + clientId));
 
         List<Account> accounts = accountRepository.findByClientId(clientId);
         List<Long> accountIds = accounts.stream().map(Account::getAccountId).collect(Collectors.toList());
-        // Client-ийн идэвхтэй зээлийн эгзэмпляр байгаа эсэхээр ажил эрхлэлтийг тодорхойлно (өөр эх сурвалж байхгүй тул).
         List<LoanInstallment> activeInstallments = accountIds.isEmpty()
                 ? List.of()
                 : loanInstallmentRepository.findByAccountIdInAndIsActive(accountIds, true);
 
-        CustomerDataDto customerData = CustomerDataDto.builder()
+        CustomerData customerData = CustomerData.builder()
                 .action("add")
                 .civilId(client.getNationalId())
                 .regnum(client.getPinId())
@@ -55,7 +72,7 @@ public class CitizenUploadServiceImpl implements CitizenUploadService {
                 .familyname(client.getFamilyName())
                 .isForeign(0)
                 .birthdate(client.getBirthDate())
-                .address(CustomerAddressDto.builder()
+                .address(CustomerAddress.builder()
                         .addressFull(client.getAddress1())
                         .apartmentName(client.getAddress2())
                         .build())
@@ -63,13 +80,13 @@ public class CitizenUploadServiceImpl implements CitizenUploadService {
                 .email(client.getEmail())
                 .taxNumber(client.getOrgPinId())
                 .isEmployed(activeInstallments.isEmpty() ? 0 : 1)
-                .bankRelation(CustomerBankRelationDto.builder()
+                .bankRelation(CustomerBankRelation.builder()
                         .action("add")
                         .relation(accounts.isEmpty() ? null : "01")
                         .build())
                 .build();
 
-        return CitizenUploadRequestDto.builder()
+        return CitizenUploadRequest.builder()
                 .patchNumber(String.valueOf(System.currentTimeMillis()))
                 .dataProviderRegnum(dataProviderRegnum)
                 .dataProviderBranch(dataProviderBranch)

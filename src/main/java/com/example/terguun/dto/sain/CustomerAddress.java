@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerAddressDto {
+public class CustomerAddress {
 
     @JsonProperty("o_c_address_full")
     private String addressFull;
