@@ -26,16 +26,16 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ACCOUNTID")
-    private Long accountId;
+    private String accountId;
 
     @Column(name = "BRANCHID")
-    private Long branchId;
+    private String branchId;
 
     @Column(name = "PRODUCTID")
     private String productId;
 
     @Column(name = "CLIENTID")
-    private Long clientId;
+    private String clientId;
 
     @Column(name = "ACCOUNTTYPE")
     private String accountType;
@@ -137,7 +137,7 @@ public class Account {
     private String lastSerialId;
 
     @Column(name = "CLOSEREASONID")
-    private String closeReasonId;
+    private Integer closeReasonId;
 
     @Column(name = "ISLOCKED")
     private Boolean isLocked;

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class citizenUploadResponse {
+public class CitizenUploadResponse {
 
     @JsonProperty("success")
     private boolean success;

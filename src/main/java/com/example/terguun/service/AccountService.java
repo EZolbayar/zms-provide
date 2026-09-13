@@ -24,7 +24,7 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    public AccountDto getById(Long id) {
+    public AccountDto getById(String id) {
         return toDto(findEntity(id));
     }
 
@@ -35,17 +35,17 @@ public class AccountService {
         return toDto(accountRepository.save(account));
     }
 
-    public AccountDto update(Long id, AccountDto dto) {
+    public AccountDto update(String id, AccountDto dto) {
         Account account = findEntity(id);
         Account updated = toEntity(dto).toBuilder().accountId(account.getAccountId()).build();
         return toDto(accountRepository.save(updated));
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         accountRepository.delete(findEntity(id));
     }
 
-    private Account findEntity(Long id) {
+    private Account findEntity(String id) {
         return accountRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account олдсонгүй, id: " + id));
     }

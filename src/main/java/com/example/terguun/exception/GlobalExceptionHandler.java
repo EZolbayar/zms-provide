@@ -11,22 +11,23 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import lombok.extern.log4j.Log4j2;
 import com.example.terguun.dto.HttpResponse;
+
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({ ResourceNotFoundException.class })
-    public ResponseEntity<HttpResponse> handleResourceNotFoundException(ResourceNotFoundException exception) {
+    public ResponseEntity<HttpResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException exception) {
         log.error("ResourceNotFoundException occured: ", exception);
 
         final int status = HttpStatus.NOT_FOUND.value();
         final String errorCode = exception.getErrorCode();
         final String errorMessage = exception.getMessage();
 
-        final HttpResponse httpResponse = HttpResponse.builder()
+        final HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
                 .status(status)
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
@@ -37,14 +38,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ MissingRequestHeaderException.class })
-    public ResponseEntity<HttpResponse> handleMissingRequestHeaderException(MissingRequestHeaderException exception) {
+    public ResponseEntity<HttpResponse<Void>> handleMissingRequestHeaderException(MissingRequestHeaderException exception) {
         log.error("MissingRequestHeaderException occured: ", exception);
 
         final int status = HttpStatus.BAD_REQUEST.value();
         final String errorCode = "ERR001";
         final String errorMessage = "Шаардлагатай header дутуу байна";
 
-        final HttpResponse httpResponse = HttpResponse.builder()
+        final HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
                 .status(status)
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
@@ -55,14 +56,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ BadRequestException.class })
-    public ResponseEntity<HttpResponse> handleBadRequestException(BadRequestException exception) {
+    public ResponseEntity<HttpResponse<Void>> handleBadRequestException(BadRequestException exception) {
         log.error("BadRequestException occured: ", exception);
 
         final int status = HttpStatus.BAD_REQUEST.value();
         final String errorCode = exception.getErrorCode();
         final String errorMessage = exception.getMessage();
 
-        final HttpResponse httpResponse = HttpResponse.builder()
+        final HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
                 .status(status)
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
@@ -73,7 +74,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ MethodArgumentNotValidException.class })
-    public ResponseEntity<HttpResponse> handleMethodArgumentNotValidExcpetion(
+    public ResponseEntity<HttpResponse<Void>> handleMethodArgumentNotValidExcpetion(
             MethodArgumentNotValidException exception) {
         log.error("MethodArgumentNotValidException occured: ", exception);
 
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler {
                         FieldError::getDefaultMessage,
                         (existing, replacement) -> existing));
 
-        HttpResponse httpResponse = HttpResponse.builder()
+        HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
                 .status(status)
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
@@ -100,7 +101,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ InvalidRequestException.class })
-    public ResponseEntity<HttpResponse> handleInvalidRequestException(InvalidRequestException exception) {
+    public ResponseEntity<HttpResponse<Void>> handleInvalidRequestException(InvalidRequestException exception) {
         log.error("InvalidRequestException occured: ", exception);
 
         int status = HttpStatus.BAD_REQUEST.value();
@@ -114,7 +115,7 @@ public class GlobalExceptionHandler {
                         FieldError::getDefaultMessage,
                         (existing, replacement) -> existing));
 
-        HttpResponse httpResponse = HttpResponse.builder()
+        HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
                 .status(status)
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
@@ -127,14 +128,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ SainException.class })
-    public ResponseEntity<HttpResponse> handleSainException(SainException exception) {
+    public ResponseEntity<HttpResponse<Void>> handleSainException(SainException exception) {
         log.debug("SainException occured: {}", exception);
 
         int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
         String message = exception.getErrorMessage();
         String code = exception.getErrorCode();
 
-        HttpResponse response = HttpResponse.builder()
+        HttpResponse<Void> response = HttpResponse.<Void>builder()
                 .status(status)
                 .errorMessage(message)
                 .errorCode(code)
@@ -142,6 +143,60 @@ public class GlobalExceptionHandler {
 
         log.info("Response: {}", response);
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler({ IllegalArgumentException.class })
+    public ResponseEntity<HttpResponse<Void>> handleIllegalArgumentException(IllegalArgumentException exception) {
+        log.error("IllegalArgumentException occured: ", exception);
+
+        final int status = HttpStatus.BAD_REQUEST.value();
+        final String errorCode = "ERR004";
+        final String errorMessage = exception.getMessage();
+
+        final HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
+                .status(status)
+                .errorCode(errorCode)
+                .errorMessage(errorMessage)
+                .build();
+
+        log.info("Response: {}", httpResponse);
+        return ResponseEntity.status(status).body(httpResponse);
+    }
+
+    @ExceptionHandler({ IllegalStateException.class })
+    public ResponseEntity<HttpResponse<Void>> handleIllegalStateException(IllegalStateException exception) {
+        log.error("IllegalStateException occured: ", exception);
+
+        final int status = HttpStatus.CONFLICT.value();
+        final String errorCode = "ERR005";
+        final String errorMessage = exception.getMessage();
+
+        final HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
+                .status(status)
+                .errorCode(errorCode)
+                .errorMessage(errorMessage)
+                .build();
+
+        log.info("Response: {}", httpResponse);
+        return ResponseEntity.status(status).body(httpResponse);
+    }
+
+    @ExceptionHandler({ Exception.class })
+    public ResponseEntity<HttpResponse<Void>> handleException(Exception exception) {
+        log.error("Unhandled exception occured: ", exception);
+
+        final int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+        final String errorCode = "BB001";
+        final String errorMessage = "Дотоод серверийн алдаа гарлаа";
+
+        final HttpResponse<Void> httpResponse = HttpResponse.<Void>builder()
+                .status(status)
+                .errorCode(errorCode)
+                .errorMessage(errorMessage)
+                .build();
+
+        log.info("Response: {}", httpResponse);
+        return ResponseEntity.status(status).body(httpResponse);
     }
 
 }

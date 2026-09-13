@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.terguun.client.SainServiceClient;
 import com.example.terguun.dto.sain.CitizenUploadRequest;
-import com.example.terguun.dto.sain.citizenUploadResponse;
+import com.example.terguun.dto.sain.CitizenUploadResponse;
+import com.example.terguun.dto.sain.CustomerData;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,9 +19,6 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class CitizenUploadService {
 
-    @Value("${look.back.hours}")
-    private int lookbackHours;
-
     private final SainServiceClient sainServiceClient;
 
     @Value("${data.provider.regnum}")
@@ -29,18 +27,28 @@ public class CitizenUploadService {
     @Value("${data.provider.branch}")
     private String dataProviderBranch;
 
-    public List<citizenUploadResponse> uploadRecentlyData(List<CitizenUploadRequest> requests) {
+    public List<CitizenUploadResponse> uploadCitizenData(List<CustomerData> requests) {
 
         log.info("Citizen upload batch эхэллээ. Илгээх request тоо: {}", requests.size());
  
-        List<citizenUploadResponse> responses = new ArrayList<>();
+        List<CitizenUploadRequest> citizenUploadRequests = new ArrayList<>();
+        List<CitizenUploadResponse> responses = new ArrayList<>();
         int failureCount = 0;
+        requests.forEach(customerData -> {
+            CitizenUploadRequest request = CitizenUploadRequest.builder()
+                    .patchNumber(String.valueOf(System.currentTimeMillis()))
+                    .dataProviderRegnum(dataProviderRegnum)
+                    .dataProviderBranch(dataProviderBranch)
+                    .customerData(List.of(customerData))
+                    .build();
+            citizenUploadRequests.add(request);
+        });
  
-        for (CitizenUploadRequest request : requests) {
+        for (CitizenUploadRequest request : citizenUploadRequests) {
             String patchNumber = request.getPatchNumber();
             try {
                 log.debug("Citizen upload илгээж байна. patchNumber={}", patchNumber);
-                citizenUploadResponse response = sainServiceClient.uploadCitizen(request);
+                CitizenUploadResponse response = sainServiceClient.uploadCitizen(request);
                 log.info("Citizen upload амжилттай. patchNumber={}", patchNumber);
                 responses.add(response);
             } catch (Exception ex) {

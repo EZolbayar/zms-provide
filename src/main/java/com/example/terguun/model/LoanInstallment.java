@@ -26,46 +26,32 @@ public class LoanInstallment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "INSTALLMENTID")
     private Long installmentId;
-
     @Column(name = "BRANCHID")
-    private Long branchId;
-
+    private String branchId;
     @Column(name = "ACCOUNTID")
-    private Long accountId;
-
+    private String accountId;
     @Column(name = "ISACTIVE")
     private Boolean isActive;
-
     @Column(name = "DUEDATE")
     private LocalDateTime dueDate;
-
     @Column(name = "PRINCIPAL")
     private BigDecimal principal;
-
     @Column(name = "INTEREST")
     private BigDecimal interest;
-
     @Column(name = "ORIGINALPRINCIPAL")
     private BigDecimal originalPrincipal;
-
     @Column(name = "AFTERBALANCE")
     private BigDecimal afterBalance;
-
     @Column(name = "BEFOREBALANCE")
     private BigDecimal beforeBalance;
-
     @Column(name = "INSTALLMENTFLAG")
     private String installmentFlag;
-
     @Column(name = "CREATEDON")
     private LocalDateTime createdOn;
-
     @Column(name = "CREATEDBY")
     private String createdBy;
-
     @Column(name = "MODIFIEDON")
     private LocalDateTime modifiedOn;
-
     @Column(name = "MODIFIEDBY")
     private String modifiedBy;
 }

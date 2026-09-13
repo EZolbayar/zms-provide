@@ -11,7 +11,9 @@ import com.example.terguun.model.LoanInstallment;
 import com.example.terguun.repository.LoanInstallmentRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class LoanInstallmentService {
@@ -24,29 +26,14 @@ public class LoanInstallmentService {
                 .collect(Collectors.toList());
     }
 
-    public LoanInstallmentDto getById(Long id) {
-        return toDto(findEntity(id));
+    public LoanInstallmentDto getById(String accountId) {
+        log.info("Fetching LoanInstallment for accountId: {}", accountId);
+        return toDto(findEntity(accountId));
     }
 
-    public LoanInstallmentDto create(LoanInstallmentDto dto) {
-        LoanInstallment loanInstallment = toEntity(dto);
-        loanInstallment.setInstallmentId(null);
-        return toDto(loanInstallmentRepository.save(loanInstallment));
-    }
-
-    public LoanInstallmentDto update(Long id, LoanInstallmentDto dto) {
-        LoanInstallment loanInstallment = findEntity(id);
-        LoanInstallment updated = toEntity(dto).toBuilder().installmentId(loanInstallment.getInstallmentId()).build();
-        return toDto(loanInstallmentRepository.save(updated));
-    }
-
-    public void delete(Long id) {
-        loanInstallmentRepository.delete(findEntity(id));
-    }
-
-    private LoanInstallment findEntity(Long id) {
-        return loanInstallmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("LoanInstallment олдсонгүй, id: " + id));
+    private LoanInstallment findEntity(String accountId) {
+        return loanInstallmentRepository.findByAccountIdIn(List.of(accountId)).stream().findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("LoanInstallment олдсонгүй, id: " + accountId));
     }
 
     private LoanInstallmentDto toDto(LoanInstallment loanInstallment) {

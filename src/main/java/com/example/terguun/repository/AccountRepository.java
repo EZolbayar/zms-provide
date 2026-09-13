@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.terguun.model.Account;
 
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, String> {
 
-    List<Account> findByClientId(Long clientId);
+    List<Account> findByClientId(String clientId);
 
     List<Account> findByCreatedOnAfterOrModifiedOnAfter(LocalDateTime createdOn, LocalDateTime modifiedOn);
 }

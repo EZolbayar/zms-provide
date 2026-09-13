@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountDto {
 
-    private Long accountId;
-    private Long branchId;
+    private String accountId;
+    private String branchId;
     private String productId;
-    private Long clientId;
+    private String clientId;
     private String accountType;
     private String accountStatus;
     private LocalDateTime statusDate;
@@ -51,7 +51,7 @@ public class AccountDto {
     private BigDecimal penaltyBalance;
     private LocalDateTime lastTrxDate;
     private String lastSerialId;
-    private String closeReasonId;
+    private Integer closeReasonId;
     private Boolean isLocked;
     private String lockedBy;
     private LocalDateTime createdOn;

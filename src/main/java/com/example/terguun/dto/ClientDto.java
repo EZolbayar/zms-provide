@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ClientDto {
 
-    private Long clientId;
-    private Long branchId;
+    private String clientId;
+    private String branchId;
     private String clientType;
     private String clientName;
     private String directorName;

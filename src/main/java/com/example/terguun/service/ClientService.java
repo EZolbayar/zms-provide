@@ -24,27 +24,11 @@ public class ClientService {
                 .collect(Collectors.toList());
     }
 
-    public ClientDto getById(Long id) {
+    public ClientDto getById(String id) {
         return toDto(findEntity(id));
     }
 
-    public ClientDto create(ClientDto dto) {
-        Client client = toEntity(dto);
-        client.setClientId(null);
-        return toDto(clientRepository.save(client));
-    }
-
-    public ClientDto update(Long id, ClientDto dto) {
-        Client client = findEntity(id);
-        Client updated = toEntity(dto).toBuilder().clientId(client.getClientId()).build();
-        return toDto(clientRepository.save(updated));
-    }
-
-    public void delete(Long id) {
-        clientRepository.delete(findEntity(id));
-    }
-
-    private Client findEntity(Long id) {
+    private Client findEntity(String id) {
         return clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client олдсонгүй, id: " + id));
     }

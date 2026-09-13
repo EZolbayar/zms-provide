@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class LoanInstallmentDto {
 
     private Long installmentId;
-    private Long branchId;
-    private Long accountId;
+    private String branchId;
+    private String accountId;
     private Boolean isActive;
     private LocalDateTime dueDate;
     private BigDecimal principal;

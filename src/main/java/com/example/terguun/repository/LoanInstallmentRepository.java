@@ -8,5 +8,5 @@ import com.example.terguun.model.LoanInstallment;
 
 public interface LoanInstallmentRepository extends JpaRepository<LoanInstallment, Long> {
 
-    List<LoanInstallment> findByAccountIdInAndIsActive(List<Long> accountIds, Boolean isActive);
+    List<LoanInstallment> findByAccountIdIn(List<String> accountIds);
 }
