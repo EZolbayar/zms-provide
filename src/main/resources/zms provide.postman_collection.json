@@ -1,0 +1,344 @@
+{
+  "info": {
+    "_postman_id": "45bd2bcb-08ed-463a-9e5a-e10485022ac8",
+    "name": "zms provide",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "18581178"
+  },
+  "item": [
+    {
+      "name": "sain",
+      "item": [
+        {
+          "name": "login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();\nif (jsonData.token) {\n    pm.collectionVariables.set(\"API_TOKEN\", jsonData.token);\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"e.zoba13@gmail.com\",\r\n    \"password\": \"9f3520c96cb22f8610af364c26989310e977cbc14188dfad486f42ac0412dba5\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{TITAN_API_TEST}}/login",
+              "host": [
+                "{{TITAN_API_TEST}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "checkapi",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{API_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{TITAN_API_TEST}}/checkapi",
+              "host": [
+                "{{TITAN_API_TEST}}"
+              ],
+              "path": [
+                "checkapi"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "upload-citizen",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{API_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"patch_number\": \"1234567890456435\",\r\n    \"data_provider_regnum\": \"3384489\",\r\n    \"data_provider_branch\": \"0013384489\",\r\n    \"customer_data\": [\r\n        {\r\n            \"action\": \"add\",\r\n            \"c_civil_id\": \"888954521912\",\r\n            \"o_c_regnum\": \"ӨӨ95121230\",\r\n            \"o_c_customer_name\": \"ДАЛАЙ\",\r\n            \"c_lastname\": \"ЭНХ\",\r\n            \"c_familyname\": \"Халх\",\r\n            \"o_c_isforeign\": 0,\r\n            \"o_c_birthdate\": \"1995-12-12\",\r\n            \"o_c_address\": {\r\n                \"o_c_address_full\": \"УБ, Сүхбаатар, 1-р хороо@сүхбаатар гудамж@1/1 байр, 1 тоот\",\r\n                \"o_c_address_aimag_city_name\": \"Улаанбаатар\",\r\n                \"o_c_address_aimag_city_code\": \"1\",\r\n                \"o_c_address_soum_district_name\": \"Сүхбаатар\",\r\n                \"o_c_address_soum_district_code\": \"1\",\r\n                \"o_c_address_bag_khoroo_name\": \"1-р хороо\",\r\n                \"o_c_address_bag_khoroo_code\": \"1\",\r\n                \"o_c_address_street_name\": \"сүхбаатар\",\r\n                \"o_c_address_region_name\": \"байхгүй\",\r\n                \"o_c_address_town_name\": \"байхгүй\",\r\n                \"o_c_address_apartment_name\": \"1/2\",\r\n                \"o_c_address_zipcode\": 11111\r\n            },\r\n            \"o_c_phone\": \"99999999\",\r\n            \"o_c_email\": \"dalai@gmail.com\",\r\n            \"c_tax_number\": \"12345678\",\r\n            \"c_family_numof_members\": 5,\r\n            \"c_family_numof_unemployed\": 1,\r\n            \"c_isemployed\": 1,\r\n            \"c_job\": {\r\n                \"c_job_position\": \"мэргэжилтэн\",\r\n                \"c_job_name\": \"байгууллага\",\r\n                \"c_job_address\": \"Монгол Улс, Улаанбаатар 1111, Бага тойруу 1\",\r\n                \"c_job_phone\": \"11333333\",\r\n                \"c_job_mail\": \"dalai@baiguullaga.mn\"\r\n            },\r\n            \"o_c_customer_bank_relation\": {\r\n                \"action\": \"add\",\r\n                \"relation\": \"01\"\r\n            }\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{TITAN_API_TEST}}/upload-citizen",
+              "host": [
+                "{{TITAN_API_TEST}}"
+              ],
+              "path": [
+                "upload-citizen"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "upload-entity",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{API_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"patch_number\": \"1234567890456465\",\r\n    \"data_provider_regnum\": \"0000038\",\r\n    \"data_provider_branch\": \"0000001234\",\r\n    \"customer_data\": [\r\n        {\r\n            \"action\": \"update\",\r\n            \"o_c_regnum\": \"5013123\",\r\n            \"o_state_regnum\": \"123456789106\",\r\n            \"o_c_customer_name\": \"ФИБА-БАЙГУУЛЛАГА\",\r\n            \"o_c_isforeign\": 0,\r\n            \"o_c_birthdate\": \"2012-12-21\",\r\n            \"o_c_address\": {\r\n                \"o_c_address_full\": \"УБ, Сүхбаатар, 1-р хороо@сүхбаатар гудамж@1/1 байр, 1 тоот\",\r\n                \"o_c_address_aimag_city_name\": \"Улаанбаатар\",\r\n                \"o_c_address_aimag_city_code\": \"1\",\r\n                \"o_c_address_soum_district_name\": \"Сүхбаатар\",\r\n                \"o_c_address_soum_district_code\": \"1\",\r\n                \"o_c_address_bag_khoroo_name\": \"1-р хороо\",\r\n                \"o_c_address_bag_khoroo_code\": \"1\",\r\n                \"o_c_address_street_name\": \"сүхбаатар\",\r\n                \"o_c_address_region_name\": \"байхгүй\",\r\n                \"o_c_address_town_name\": \"байхгүй\",\r\n                \"o_c_address_apartment_name\": \"1/1\",\r\n                \"o_c_address_zipcode\": 11111\r\n            },\r\n            \"o_c_phone\": \"99999999\",\r\n            \"o_c_email\": \"test@baiguullaga.com\",\r\n            \"o_numof_employee\": 100,\r\n            \"o_company_type\": \"03\",\r\n            \"o_orgrate\": {\r\n                \"o_orgrate_agency\": \"01\",\r\n                \"o_orgrate_rating\": \"Үнэлгээ хийлгээгүй\"\r\n            },\r\n            \"o_ceo\": {\r\n                \"o_ceo_civil_id\": \"123456789012\",\r\n                \"o_ceo_regnum\": \"ЙЙ12345678\",\r\n                \"o_ceo_firstname\": \"БАТ\",\r\n                \"o_ceo_lastname\": \"БААТАР\",\r\n                \"o_ceo_familyname\": \"БОРЖИГИН\",\r\n                \"o_ceo_isforeign\": 0,\r\n                \"o_ceo_address\": \"УБ, Сүхбаатар, 1-р хороо@сүхбаатар гудамж@1/1 байр, 1 тоот\",\r\n                \"o_ceo_phone\": \"99999919\",\r\n                \"o_ceo_email\": \"bat@baiguullaga.com\"\r\n            },\r\n            \"o_numof_shareholder_org\": 5,\r\n            \"o_shareholder_org\": [\r\n                {\r\n                    \"action\": \"update\",\r\n                    \"o_shareholder_org_name\": \"ТЕСТ Х/Э БАЙГУУЛЛАГА\",\r\n                    \"o_shareholder_org_isforeign\": 0,\r\n                    \"o_shareholder_org_state_regnum\": \"12345678901\",\r\n                    \"o_shareholder_org_regnum\": \"7654321\",\r\n                    \"o_shareholder_org_address\": \"УБ, Сүхбаатар, 1-р хороо@сүхбаатар гудамж@1/1 байр, 1 тоот\",\r\n                    \"o_shareholder_org_phone\": \"88888888\",\r\n                    \"o_shareholder_org_email\": \"test@shareholder.com\"\r\n                }\r\n            ],\r\n            \"o_numof_shareholder_customer\": 100,\r\n            \"o_shareholder_customer\": [\r\n                {\r\n                    \"action\": \"update\",\r\n                    \"o_shareholder_customer_civil_id\": \"987654321098\",\r\n                    \"o_shareholder_customer_regnum\": \"ББ12345678\",\r\n                    \"o_shareholder_customer_firstname\": \"ДУЛМАА\",\r\n                    \"o_shareholder_customer_lastname\": \"ИТГЭЛ\",\r\n                    \"o_shareholder_customer_familyname\": \"БОРЖИГИН\",\r\n                    \"o_shareholder_customer_isforeign\": 0,\r\n                    \"o_shareholder_customer_address\": \"УБ, Сүхбаатар, 1-р хороо@сүхбаатар гудамж@1/1 байр, 1 тоот\",\r\n                    \"o_shareholder_customer_phone\": \"88880022\",\r\n                    \"o_shareholder_customer_email\": \"dulam@shareholder.com\"\r\n                }\r\n            ],\r\n            \"o_c_related_customer\": [\r\n                {\r\n                    \"action\": \"update\",\r\n                    \"o_c_related_customer_index\": 1,\r\n                    \"o_c_related_customer_firstname\": \"БОЛД\",\r\n                    \"o_c_related_customer_lastname\": \"СҮРЭН\",\r\n                    \"o_c_related_customer_familyname\": \"БОРЖИГИН\",\r\n                    \"o_c_related_customer_isforeign\": 0,\r\n                    \"o_c_related_customer_civid_id\": \"876543219123\",\r\n                    \"o_c_related_customer_regnum\": \"ЦЦ12345678\",\r\n                    \"o_c_related_customer_relation\": \"04\",\r\n                    \"o_c_related_customer_isfinancial_onus\": 1\r\n                }\r\n            ],\r\n            \"o_c_customer_bank_relation\": {\r\n                \"action\": \"update\",\r\n                \"relation\": \"01\"\r\n            },\r\n            \"o_c_loan_information\": [\r\n                {\r\n                    \"action\": \"update\",\r\n                    \"o_c_loan_contract_date\": \"2023-11-07 11:02:20\",\r\n                    \"o_c_loan_contractno\": \"123456789456123456748978456151\",\r\n                    \"o_c_loan_contract_change_reason\": \"\",\r\n                    \"o_c_loan_collateral_indexes\": [\r\n                        1\r\n                    ],\r\n                    \"o_c_loan_related_customer_indexes\": [\r\n                        1\r\n                    ],\r\n                    \"o_c_loan_amount_lcy\": 69062132131.22,\r\n                    \"o_c_loan_amount_fcy\": 200000.00,\r\n                    \"o_c_loan_balance_lcy\": 690600000.00,\r\n                    \"o_c_loan_balance_fcy\": 200000.00,\r\n                    \"o_c_loan_interest_balance_lcy\": 0.0,\r\n                    \"o_c_loan_interest_balance_fcy\": 0.0,\r\n                    \"o_c_loan_additional_interest_balance_lcy\": 0.0,\r\n                    \"o_c_loan_additional_interest_balance_fcy\": 0.0,\r\n                    \"o_c_loan_currency_rate\": 3453.00,\r\n                    \"o_c_loan_loan_provenance\": \"01\",\r\n                    \"o_c_loan_starteddate\": \"2023-11-07 12:45:12\",\r\n                    \"o_c_loan_expdate\": \"2024-11-07\",\r\n                    \"o_c_loan_status\": \"01\",\r\n                    \"o_c_loan_currency\": \"MNT\",\r\n                    \"o_c_loan_sector\": \"A01\",\r\n                    \"o_c_loan_interest_rate\": 3.0,\r\n                    \"o_c_loan_additional_interest_rate\": 0.0,\r\n                    \"o_c_loan_commission\": 300.00,\r\n                    \"o_c_loan_fee\": 10.00,\r\n                    \"o_c_loan_class\": \"01\",\r\n                    \"o_c_loan_type\": \"A01\",\r\n                    \"o_c_loan_line_contractno\": \"\",\r\n                    \"o_c_loan_description\": \"\",\r\n                    \"o_c_loan_transactions\": {\r\n                        \"o_c_loan_schedule_type\": \"01\",\r\n                        \"o_c_loan_schedule_status\": 0,\r\n                        \"o_c_loan_schedule_change_reason\": \"\",\r\n                        \"o_c_loan_schedule\": [\r\n                            {\r\n                                \"action\": \"update\",\r\n                                \"o_c_schedule_due_date\": \"2023-12-07\",\r\n                                \"o_c_schedule_principal\": 45.12,\r\n                                \"o_c_schedule_interest\": 45.12,\r\n                                \"o_c_schedule_additional\": 45.12,\r\n                                \"o_c_schedule_balance\": 45.12\r\n                            },\r\n                            {\r\n                                \"action\": \"update\",\r\n                                \"o_c_schedule_due_date\": \"2024-01-07\",\r\n                                \"o_c_schedule_principal\": 45.12,\r\n                                \"o_c_schedule_interest\": 45.12,\r\n                                \"o_c_schedule_additional\": 45.12,\r\n                                \"o_c_schedule_balance\": 45.12\r\n                            }\r\n                        ]\r\n                    }\r\n                }\r\n            ],\r\n            \"o_c_coll_information\": [\r\n                {\r\n                    \"action\": \"update\",\r\n                    \"o_c_coll_index\": 1,\r\n                    \"o_c_coll_contractno\": \"45645646545646456\",\r\n                    \"o_c_coll_internalno\": \"4897891154984894894\",\r\n                    \"o_c_coll_type\": \"G01\",\r\n                    \"o_c_coll_description\": \"байр\",\r\n                    \"o_c_coll_valuation_date\": \"2012-11-12\",\r\n                    \"o_c_coll_value\": 800000000.00,\r\n                    \"o_c_coll_max_value\": 900000000.00,\r\n                    \"o_c_coll_address\": \"УБ, Сүхбаатар, 1-р хороо@сүхбаатар гудамж@1/1 байр, 1 тоот\",\r\n                    \"o_c_coll_zipcode\": 14201,\r\n                    \"o_c_coll_is_real_estate\": 1,\r\n                    \"o_c_coll_state_registration\": {\r\n                        \"o_c_coll_certificateno\": \"156489\",\r\n                        \"o_c_coll_state_regnum\": \"Ү-12345687\",\r\n                        \"o_c_coll_registered_date\": \"2012-11-12\",\r\n                        \"o_c_coll_confirmed_date\": \"2012-11-15\"\r\n                    },\r\n                    \"o_c_coll_customer\": [\r\n                        {\r\n                            \"action\": \"update\",\r\n                            \"o_c_coll_customer_firstname\": \"ДАЛАЙ\",\r\n                            \"o_c_coll_customer_lastname\": \"ЭНХ\",\r\n                            \"o_c_coll_customer_familyname\": \"БОРЖИГИН\",\r\n                            \"o_c_coll_customer_isforeign\": 0,\r\n                            \"o_c_coll_customer_civil_id\": \"333954521968\",\r\n                            \"o_c_coll_customer_regnum\": \"УУ99119911\"\r\n                        }\r\n                    ]\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{TITAN_API_TEST}}/upload-entity",
+              "host": [
+                "{{TITAN_API_TEST}}"
+              ],
+              "path": [
+                "upload-entity"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "checklogin",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{API_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{TITAN_API_TEST}}/checklogin",
+              "host": [
+                "{{TITAN_API_TEST}}"
+              ],
+              "path": [
+                "checklogin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "products",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{API_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{TITAN_API_TEST}}/products",
+              "host": [
+                "{{TITAN_API_TEST}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "provider",
+      "item": [
+        {
+          "name": "loans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8081/api/accounts",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "send-data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8081/api/send-data",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "send-data"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "citizen-upload",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"data\": [\r\n        {\r\n            \"action\": \"add\",\r\n            \"c_civil_id\": \"\",\r\n            \"o_c_regnum\": \"ЖЯ82060217\",\r\n            \"o_c_customer_name\": \"Цолмон\",\r\n            \"c_lastname\": \"Энхээхүү\",\r\n            \"c_familyname\": \"Боржгон\",\r\n            \"o_c_isforeign\": 0,\r\n            \"o_c_birthdate\": \"1982-06-02\",\r\n            \"o_c_address\": {\r\n                \"o_c_address_full\": \"Дорнод аймаг Хэрлэн сум 2-р баг Март 4-1 тоот\",\r\n                \"o_c_address_aimag_city_name\": null,\r\n                \"o_c_address_aimag_city_code\": null,\r\n                \"o_c_address_soum_district_name\": null,\r\n                \"o_c_address_soum_district_code\": null,\r\n                \"o_c_address_bag_khoroo_name\": null,\r\n                \"o_c_address_bag_khoroo_code\": null,\r\n                \"o_c_address_street_name\": null,\r\n                \"o_c_address_region_name\": null,\r\n                \"o_c_address_town_name\": null,\r\n                \"o_c_address_apartment_name\": \"\",\r\n                \"o_c_address_zipcode\": null\r\n            },\r\n            \"o_c_phone\": \"99575848\",\r\n            \"o_c_email\": \"\",\r\n            \"c_tax_number\": \"\",\r\n            \"c_family_numof_members\": null,\r\n            \"c_family_numof_unemployed\": null,\r\n            \"c_isemployed\": 1,\r\n            \"c_job\": null,\r\n            \"o_c_related_org\": null,\r\n            \"o_c_related_customer\": null,\r\n            \"o_c_customer_bank_relation\": {\r\n                \"action\": \"add\",\r\n                \"relation\": \"01\"\r\n            },\r\n            \"o_c_loan_information\": {\r\n                \"action\": \"add\",\r\n                \"o_c_loan_contract_date\": \"2026-09-13\",\r\n                \"o_c_loan_contractno\": \"\",\r\n                \"o_c_loan_contract_change_reason\": null,\r\n                \"o_c_loan_collateral_indexes\": null,\r\n                \"o_c_loan_related_org_indexes\": null,\r\n                \"o_c_loan_related_customer_indexes\": null,\r\n                \"o_c_loan_amount_lcy\": 0,\r\n                \"o_c_loan_amount_fcy\": null,\r\n                \"o_c_loan_balance_lcy\": 500000,\r\n                \"o_c_loan_balance_fcy\": null,\r\n                \"o_c_loan_interest_balance_lcy\": 0,\r\n                \"o_c_loan_interest_balance_fcy\": null,\r\n                \"o_c_loan_additional_interest_balance_lcy\": 0,\r\n                \"o_c_loan_additional_interest_balance_fcy\": null,\r\n                \"o_c_loan_currency_rate\": null,\r\n                \"o_c_loan_loan_provenance\": null,\r\n                \"o_c_loan_bond_market\": null,\r\n                \"o_c_loan_numof_bonds\": null,\r\n                \"o_c_loan_bond_unit_price\": null,\r\n                \"o_c_loan_starteddate\": \"2026-09-13\",\r\n                \"o_c_loan_expdate\": null,\r\n                \"o_c_loan_status\": \"A\",\r\n                \"o_c_loan_decide_status\": null,\r\n                \"o_c_loan_paiddate\": null,\r\n                \"o_c_loan_currency\": null,\r\n                \"o_c_loan_sector\": null,\r\n                \"o_c_loan_interest_rate\": 0,\r\n                \"o_c_loan_additional_interest_rate\": null,\r\n                \"o_c_loan_commission\": null,\r\n                \"o_c_loan_fee\": null,\r\n                \"o_c_loan_class\": null,\r\n                \"o_c_loan_type\": \"D\",\r\n                \"o_c_loan_line_contractno\": null,\r\n                \"o_c_loan_description\": null,\r\n                \"o_c_loan_transactions\": {\r\n                    \"o_c_loan_schedule_type\": null,\r\n                    \"o_c_loan_schedule_status\": null,\r\n                    \"o_c_loan_schedule_change_reason\": null,\r\n                    \"o_c_loan_schedule\": [\r\n                        {\r\n                            \"action\": \"add\",\r\n                            \"o_c_schedule_due_date\": \"2026-10-13\",\r\n                            \"o_c_schedule_principal\": \"0.0000\",\r\n                            \"o_c_schedule_interest\": \"100000.0000\",\r\n                            \"o_c_schedule_additional\": null,\r\n                            \"o_c_schedule_balance\": \"4000000.0000\"\r\n                        },\r\n                        {\r\n                            \"action\": \"add\",\r\n                            \"o_c_schedule_due_date\": \"2026-11-13\",\r\n                            \"o_c_schedule_principal\": \"0.0000\",\r\n                            \"o_c_schedule_interest\": \"90000.0000\",\r\n                            \"o_c_schedule_additional\": null,\r\n                            \"o_c_schedule_balance\": \"3000000.0000\"\r\n                        },\r\n                        {\r\n                            \"action\": \"add\",\r\n                            \"o_c_schedule_due_date\": \"2026-12-13\",\r\n                            \"o_c_schedule_principal\": \"0.0000\",\r\n                            \"o_c_schedule_interest\": \"80000.0000\",\r\n                            \"o_c_schedule_additional\": null,\r\n                            \"o_c_schedule_balance\": \"2000000.0000\"\r\n                        },\r\n                        {\r\n                            \"action\": \"add\",\r\n                            \"o_c_schedule_due_date\": \"2027-01-13\",\r\n                            \"o_c_schedule_principal\": \"0.0000\",\r\n                            \"o_c_schedule_interest\": \"70000.0000\",\r\n                            \"o_c_schedule_additional\": null,\r\n                            \"o_c_schedule_balance\": \"1000000.0000\"\r\n                        },\r\n                        {\r\n                            \"action\": \"add\",\r\n                            \"o_c_schedule_due_date\": \"2026-02-13\",\r\n                            \"o_c_schedule_principal\": \"0.0000\",\r\n                            \"o_c_schedule_interest\": \"60000.0000\",\r\n                            \"o_c_schedule_additional\": null,\r\n                            \"o_c_schedule_balance\": \"0.0000\"\r\n                        }\r\n                    ],\r\n                    \"o_c_loan_payment\": null\r\n                }\r\n            },\r\n            \"o_c_loanline\": null,\r\n            \"o_c_coll_information\": null\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8081/api/citizen-upload",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "citizen-upload"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\": \"ZOL\",\r\n    \"password\": \"123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8081/api/login",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "localhost:8081/api/logout/ZOL",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "logout",
+                "ZOL"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "API_TOKEN",
+      "value": ""
+    },
+    {
+      "key": "TITAN_API_TEST",
+      "value": ""
+    }
+  ]
+}

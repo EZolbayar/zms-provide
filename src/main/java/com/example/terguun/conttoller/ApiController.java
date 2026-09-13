@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.terguun.dto.AccountDto;
 import com.example.terguun.dto.HttpResponse;
 import com.example.terguun.dto.Login;
+import com.example.terguun.dto.UploadRequest;
 import com.example.terguun.dto.sain.CitizenUploadResponse;
 import com.example.terguun.dto.sain.CustomerData;
 import com.example.terguun.service.AccountService;
@@ -56,9 +57,9 @@ public class ApiController {
     }
 
     @PostMapping("/upload-citizen")
-    public ResponseEntity<HttpResponse<List<CitizenUploadResponse>>> uploadCitizen(@RequestBody CustomerData entity) {
+    public ResponseEntity<HttpResponse<List<CitizenUploadResponse>>> uploadCitizen(@RequestBody UploadRequest request) {
     
-        List<CitizenUploadResponse> response = citizenUploadService.uploadCitizenData(List.of(entity));
+        List<CitizenUploadResponse> response = citizenUploadService.uploadCitizenData(request.getData());
         
         return ResponseEntity.ok(HttpResponse.success(response));
     }
