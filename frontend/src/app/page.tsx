@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Account, api, UploadResult, usingDummyData } from "@/lib/api";
+import { Account, api, LoginResponse, UploadResult, usingDummyData } from "@/lib/api";
 
 export default function Home() {
+    const [userId, setUserId] = useState("");
+    const [password, setPassword] = useState("");
+    const [user, setUser] = useState<LoginResponse | null>(null);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [uploadResults, setUploadResults] = useState<UploadResult[] | null>(null);
     const [selectedClientIds, setSelectedClientIds] = useState<string[]>([]);
@@ -18,6 +21,14 @@ export default function Home() {
     }
 
     const loadAccounts = () => void execute(async () => { const result = await api.accounts(); setAccounts(result); setMessage(`${result.length} дансны мэдээлэл ачааллаа.`); });
+    const login = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        void execute(async () => {
+            const result = await api.login(userId, password);
+            setUser(result);
+            setMessage("");
+        });
+    };
     const uploadSelectedCustomers = () => void execute(async () => {
         if (selectedClientIds.length === 0) return;
         const customers = await api.customersForClients(selectedClientIds);
@@ -39,6 +50,24 @@ export default function Home() {
     const toggleClient = (clientId: string) => setSelectedClientIds((selected) => selected.includes(clientId) ? selected.filter((id) => id !== clientId) : [...selected, clientId]);
     const toggleAllVisible = () => setSelectedClientIds((selected) => allVisibleSelected ? selected.filter((id) => !visibleClientIds.includes(id)) : [...new Set([...selected, ...visibleClientIds])]);
 
+    if (!user) return <main className="login-screen">
+        <section className="login-brand-panel">
+            <div className="brand"><span className="brand-mark">Z</span><span>ZMS</span></div>
+            <div className="login-brand-copy"><p className="section-kicker">УДИРДЛАГЫН СИСТЕМ</p><h1>Дансны мэдээллийн нэгдсэн удирдлага</h1><p>Харилцагчийн мэдээллийг хянаж, Сайн систем рүү багцаар илгээнэ.</p></div>
+            <div className="login-status"><span className="live-dot" />{usingDummyData ? "Демо орчин идэвхтэй" : "Систем холбогдоход бэлэн"}</div>
+        </section>
+        <section className="login-form-panel">
+            <form className="login-form" onSubmit={login}>
+                <p className="breadcrumb">ТАВТАЙ МОРИЛНО УУ</p><h2>Нэвтрэх</h2><p>Системийн эрхээрээ нэвтэрнэ үү.</p>
+                <label>Хэрэглэгчийн нэр<input value={userId} onChange={(event) => setUserId(event.target.value)} autoComplete="username" required /></label>
+                <label>Нууц үг<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required /></label>
+                {message && <p className="login-error">{message}</p>}
+                <button className="primary-button login-submit" type="submit" disabled={busy}>{busy ? "Шалгаж байна..." : "Нэвтрэх"}</button>
+                {usingDummyData && <small className="demo-hint">Демо орчинд дурын нэр, нууц үг ашиглаж болно.</small>}
+            </form>
+        </section>
+    </main>;
+
     return <main className="admin-shell">
         <aside className="sidebar">
             <div className="brand"><span className="brand-mark">Z</span><span>ZMS</span></div><p className="menu-label">УДИРДЛАГЫН САМБАР</p>
@@ -46,7 +75,7 @@ export default function Home() {
             <div className="sidebar-footer"><span className="live-dot" />{usingDummyData ? "Демо орчин" : "API холбогдсон"}</div>
         </aside>
         <section className="dashboard">
-            <header className="header"><div><p className="breadcrumb">АДМИН / ДАНСНЫ БҮРТГЭЛ</p><h1>Дансны удирдлага</h1></div><div className="user-menu"><span className="user-avatar">A</span><div><strong>Администратор</strong><small>Системийн оператор</small></div></div></header>
+            <header className="header"><div><p className="breadcrumb">АДМИН / ДАНСНЫ БҮРТГЭЛ</p><h1>Дансны удирдлага</h1></div><div className="user-menu"><span className="user-avatar">{user.userName.charAt(0).toUpperCase()}</span><div><strong>{user.userName}</strong><small>Системийн оператор</small></div></div></header>
             <section className="page-heading"><div><h2>Бүртгэлтэй дансууд</h2><p>Сонгосон харилцагчийн мэдээллийг Сайн систем рүү багцаар илгээнэ.</p></div><button className="primary-button" onClick={uploadSelectedCustomers} disabled={busy || selectedClientIds.length === 0}>{busy ? "Илгээж байна..." : `Сонгосон ${selectedClientIds.length} харилцагчийг илгээх`}</button></section>
             <section className="summary-grid" aria-label="Дансны товч мэдээлэл"><div><span>Нийт данс</span><strong>{accounts.length}</strong><small>Ачаалсан бүртгэл</small></div><div><span>Идэвхтэй данс</span><strong>{accounts.filter((account) => account.accountStatus === "ACTIVE").length}</strong><small>Боловсруулах боломжтой</small></div><div><span>Сонгосон харилцагч</span><strong>{selectedClientIds.length}</strong><small>Багцаар илгээхэд бэлэн</small></div></section>
             <section className="inventory-panel"><div className="panel-toolbar"><div><h3>Дансны жагсаалт</h3><p>ZMS-д бүртгэлтэй бүх данс</p></div><div className="toolbar-actions"><label className="search-field"><span>ХАЙХ</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Данс, харилцагч, бүтээгдэхүүн..." /></label><button className="outline-button" onClick={loadAccounts} disabled={busy}>Шинэчлэх</button></div></div><div className="table-wrap"><table><thead><tr><th><input className="row-checkbox" type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Харагдаж буй бүх харилцагчийг сонгох" /></th><th>Дансны дугаар</th><th>Харилцагч</th><th>Бүтээгдэхүүн</th><th>Төрөл</th><th>Төлөв</th><th className="amount">Үлдэгдэл</th><th>Нээсэн огноо</th></tr></thead><tbody>{visibleAccounts.length > 0 ? visibleAccounts.map((account) => <tr key={account.accountId}><td><input className="row-checkbox" type="checkbox" checked={selectedClientIds.includes(account.clientId)} onChange={() => toggleClient(account.clientId)} aria-label={`${account.clientId} харилцагчийг сонгох`} /></td><td className="account-id">{account.accountId}</td><td>{account.clientId}</td><td>{account.productId}</td><td>{account.accountType}</td><td><span className="status">{account.accountStatus === "ACTIVE" ? "ИДЭВХТЭЙ" : account.accountStatus}</span></td><td className="amount">{Number(account.balance ?? 0).toLocaleString("en-US")}</td><td>{account.openDate}</td></tr>) : <tr><td className="empty-state" colSpan={8}>Хайлтад тохирох бүртгэл олдсонгүй.</td></tr>}</tbody></table></div></section>
