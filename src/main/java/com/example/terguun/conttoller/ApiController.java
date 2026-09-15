@@ -1,4 +1,5 @@
 package com.example.terguun.conttoller;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -37,13 +38,12 @@ public class ApiController {
         Login.Response response = loginService.login(request);
         return ResponseEntity.ok(HttpResponse.success(response));
     }
- 
+
     @PostMapping("/logout/{userId}")
     public ResponseEntity<HttpResponse<Void>> logout(@PathVariable String userId) {
         loginService.logout(userId);
         return ResponseEntity.ok(HttpResponse.success(null));
     }
-
 
     @GetMapping("/accounts")
     public ResponseEntity<HttpResponse<List<AccountDto>>> getAll() {
@@ -56,14 +56,18 @@ public class ApiController {
         return ResponseEntity.ok(HttpResponse.success(data));
     }
 
+    @PostMapping("/send-data")
+    public ResponseEntity<HttpResponse<List<CustomerData>>> getCitizenUploadForClients(
+            @RequestBody List<String> clientIds) {
+        return ResponseEntity.ok(HttpResponse.success(recentlyDataService.buildForClients(clientIds)));
+    }
+
     @PostMapping("/upload-citizen")
     public ResponseEntity<HttpResponse<List<CitizenUploadResponse>>> uploadCitizen(@RequestBody UploadRequest request) {
-    
+
         List<CitizenUploadResponse> response = citizenUploadService.uploadCitizenData(request.getData());
-        
+
         return ResponseEntity.ok(HttpResponse.success(response));
     }
-    
 
 }
-

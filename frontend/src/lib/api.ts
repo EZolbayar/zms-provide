@@ -89,6 +89,10 @@ export const api = {
     logout: (userId: string) => usingDummyData ? simulate(undefined) : request<void>(`/logout/${encodeURIComponent(userId)}`, { method: "POST" }),
     accounts: () => usingDummyData ? simulate(dummyAccounts) : request<Account[]>("/accounts"),
     latestCustomer: () => usingDummyData ? simulate(dummyCustomer) : request<CustomerData | null>("/send-data"),
+    customersForClients: (clientIds: string[]) =>
+        usingDummyData
+            ? simulate(clientIds.map((clientId) => ({ ...dummyCustomer, regnum: clientId })))
+            : request<CustomerData[]>("/send-data", { method: "POST", body: JSON.stringify(clientIds) }),
     uploadCitizen: (data: CustomerData[]) =>
         usingDummyData
             ? simulate(data.map((item) => ({ success: true, action: String(item.action ?? "add") })))

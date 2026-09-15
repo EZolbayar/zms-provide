@@ -31,115 +31,133 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class RecentlyDataService {
 
-    @Value("${look.back.hours}")
-    private int lookbackHours;
+        @Value("${look.back.hours}")
+        private int lookbackHours;
 
-    private final ClientRepository clientRepository;
-    private final AccountRepository accountRepository;
-    private final LoanInstallmentRepository loanInstallmentRepository;
+        private final ClientRepository clientRepository;
+        private final AccountRepository accountRepository;
+        private final LoanInstallmentRepository loanInstallmentRepository;
 
-    public List<CustomerData> buildForRecentlyChangedAccounts() {
-        LocalDateTime since = LocalDateTime.now().minusHours(lookbackHours);
+        public List<CustomerData> buildForRecentlyChangedAccounts() {
+                LocalDateTime since = LocalDateTime.now().minusHours(lookbackHours);
 
-        List<Account> recentAccounts = accountRepository.findByCreatedOnAfterOrModifiedOnAfter(since, since);
+                List<Account> recentAccounts = accountRepository.findByCreatedOnAfterOrModifiedOnAfter(since, since);
 
-        log.info("Found recent accounts: {}", recentAccounts);
+                log.info("Found recent accounts: {}", recentAccounts);
 
-        List<String> clientIds = recentAccounts.stream()
-                .map(Account::getClientId)
-                .distinct()
-                .collect(Collectors.toList());
+                List<String> clientIds = recentAccounts.stream()
+                                .map(Account::getClientId)
+                                .distinct()
+                                .collect(Collectors.toList());
 
-        return clientIds.stream()
-                .map(this::buildForClient)
-                .collect(Collectors.toList());
-    }
-
-    private CustomerData buildForClient(String clientId) {
-        Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Client олдсонгүй, id: " + clientId));
-
-        List<Account> accounts = accountRepository.findByClientId(clientId);
-        List<Account> activeAccounts = accounts.stream()
-                .filter(account -> "A".equals(account.getAccountStatus()))
-                .collect(Collectors.toList());
-        List<String> activeAccountIds = activeAccounts.stream()
-                .map(Account::getAccountId)
-                .collect(Collectors.toList());
-        log.info("Found accounts for clientId: {}: activeAccountIds: {}", clientId, activeAccountIds);
-
-        Account loanAccount;
-        List<LoanInstallment> activeInstallments;
-        if (!activeAccountIds.isEmpty()) {
-            activeInstallments = loanInstallmentRepository.findByAccountIdIn(activeAccountIds);
-            loanAccount = activeAccounts.stream()
-                    .max(Comparator.comparing(Account::getCreatedOn, Comparator.nullsFirst(Comparator.naturalOrder())))
-                    .orElse(null);
-            log.info("Found active installments for clientId: {}: {}", clientId, activeInstallments);
-        } else {
-            Optional<Account> latestAccount = accounts.stream()
-                    .max(Comparator.comparing(Account::getCreatedOn, Comparator.nullsFirst(Comparator.naturalOrder())));
-            activeInstallments = latestAccount
-                    .map(account -> loanInstallmentRepository.findByAccountIdIn(List.of(account.getAccountId())))
-                    .orElse(List.of());
-            loanAccount = latestAccount.orElse(null);
-            log.info("Found active installments for clientId: {}: {}", clientId, activeInstallments);
+                return clientIds.stream()
+                                .map(this::buildForClient)
+                                .collect(Collectors.toList());
         }
 
-        LoanInformation loanInformation = loanAccount == null ? null : LoanInformation.builder()
-                .action("add")
-                .contractDate(loanAccount.getOpenDate() == null ? null : loanAccount.getOpenDate().toLocalDate())
-                .contractNo(loanAccount.getContractId())
-                .amountLcy(loanAccount.getAppliedAmount())
-                .balanceLcy(loanAccount.getBalance())
-                .interestBalanceLcy(loanAccount.getInterestBalance())
-                .additionalInterestBalanceLcy(loanAccount.getPenaltyBalance())
-                .interestRate(loanAccount.getInterestRate())
-                .startedDate(loanAccount.getOpenDate() == null ? null : loanAccount.getOpenDate().toLocalDate())
-                .expDate(loanAccount.getMatureDate() == null ? null : loanAccount.getMatureDate().toLocalDate())
-                .status(loanAccount.getAccountStatus())
-                .type(loanAccount.getAccountType())
-                .loanTransactions(LoanTransactions.builder()
-                        .loanSchedule(activeInstallments.stream()
-                                .map(this::toLoanSchedule)
-                                .collect(Collectors.toList()))
-                        .build())
-                .build();
+        public List<CustomerData> buildForClients(List<String> clientIds) {
+                return clientIds.stream()
+                                .distinct()
+                                .map(this::buildForClient)
+                                .collect(Collectors.toList());
+        }
 
-        CustomerData customerData = CustomerData.builder()
-                .action("add")
-                .civilId(client.getNationalId())
-                .regnum(client.getPinId())
-                .customerName(client.getClientName())
-                .lastname(client.getFirstName())
-                .familyname(client.getFamilyName())
-                .isForeign(0)
-                .birthdate(client.getBirthDate())
-                .address(CustomerAddress.builder()
-                        .addressFull(client.getAddress1())
-                        .apartmentName(client.getAddress2())
-                        .build())
-                .phone(client.getPhone1())
-                .email(client.getEmail())
-                .taxNumber(client.getOrgPinId())
-                .isEmployed(activeInstallments.isEmpty() ? 0 : 1)
-                .loanInformation(loanInformation)
-                .bankRelation(CustomerBankRelation.builder()
-                        .action("add")
-                        .relation(accounts.isEmpty() ? null : "01")
-                        .build())
-                .build();
+        private CustomerData buildForClient(String clientId) {
+                Client client = clientRepository.findById(clientId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Client олдсонгүй, id: " + clientId));
 
-        return customerData;
-    }
+                List<Account> accounts = accountRepository.findByClientId(clientId);
+                List<Account> activeAccounts = accounts.stream()
+                                .filter(account -> "A".equals(account.getAccountStatus()))
+                                .collect(Collectors.toList());
+                List<String> activeAccountIds = activeAccounts.stream()
+                                .map(Account::getAccountId)
+                                .collect(Collectors.toList());
+                log.info("Found accounts for clientId: {}: activeAccountIds: {}", clientId, activeAccountIds);
 
-    private LoanSchedule toLoanSchedule(LoanInstallment loanInstallment) {
-        return LoanSchedule.builder()
-                .action("add")
-                .dueDate(loanInstallment.getDueDate() == null ? null : loanInstallment.getDueDate().toLocalDate().toString())
-                .principal(loanInstallment.getPrincipal() == null ? null : loanInstallment.getPrincipal().toString())
-                .interest(loanInstallment.getInterest() == null ? null : loanInstallment.getInterest().toString())
-                .balance(loanInstallment.getAfterBalance() == null ? null : loanInstallment.getAfterBalance().toString())
-                .build();
-    }
+                Account loanAccount;
+                List<LoanInstallment> activeInstallments;
+                if (!activeAccountIds.isEmpty()) {
+                        activeInstallments = loanInstallmentRepository.findByAccountIdIn(activeAccountIds);
+                        loanAccount = activeAccounts.stream()
+                                        .max(Comparator.comparing(Account::getCreatedOn,
+                                                        Comparator.nullsFirst(Comparator.naturalOrder())))
+                                        .orElse(null);
+                        log.info("Found active installments for clientId: {}: {}", clientId, activeInstallments);
+                } else {
+                        Optional<Account> latestAccount = accounts.stream()
+                                        .max(Comparator.comparing(Account::getCreatedOn,
+                                                        Comparator.nullsFirst(Comparator.naturalOrder())));
+                        activeInstallments = latestAccount
+                                        .map(account -> loanInstallmentRepository
+                                                        .findByAccountIdIn(List.of(account.getAccountId())))
+                                        .orElse(List.of());
+                        loanAccount = latestAccount.orElse(null);
+                        log.info("Found active installments for clientId: {}: {}", clientId, activeInstallments);
+                }
+
+                LoanInformation loanInformation = loanAccount == null ? null
+                                : LoanInformation.builder()
+                                                .action("add")
+                                                .contractDate(loanAccount.getOpenDate() == null ? null
+                                                                : loanAccount.getOpenDate().toLocalDate())
+                                                .contractNo(loanAccount.getContractId())
+                                                .amountLcy(loanAccount.getAppliedAmount())
+                                                .balanceLcy(loanAccount.getBalance())
+                                                .interestBalanceLcy(loanAccount.getInterestBalance())
+                                                .additionalInterestBalanceLcy(loanAccount.getPenaltyBalance())
+                                                .interestRate(loanAccount.getInterestRate())
+                                                .startedDate(loanAccount.getOpenDate() == null ? null
+                                                                : loanAccount.getOpenDate().toLocalDate())
+                                                .expDate(loanAccount.getMatureDate() == null ? null
+                                                                : loanAccount.getMatureDate().toLocalDate())
+                                                .status(loanAccount.getAccountStatus())
+                                                .type(loanAccount.getAccountType())
+                                                .loanTransactions(LoanTransactions.builder()
+                                                                .loanSchedule(activeInstallments.stream()
+                                                                                .map(this::toLoanSchedule)
+                                                                                .collect(Collectors.toList()))
+                                                                .build())
+                                                .build();
+
+                CustomerData customerData = CustomerData.builder()
+                                .action("add")
+                                .civilId(client.getNationalId())
+                                .regnum(client.getPinId())
+                                .customerName(client.getClientName())
+                                .lastname(client.getFirstName())
+                                .familyname(client.getFamilyName())
+                                .isForeign(0)
+                                .birthdate(client.getBirthDate())
+                                .address(CustomerAddress.builder()
+                                                .addressFull(client.getAddress1())
+                                                .apartmentName(client.getAddress2())
+                                                .build())
+                                .phone(client.getPhone1())
+                                .email(client.getEmail())
+                                .taxNumber(client.getOrgPinId())
+                                .isEmployed(activeInstallments.isEmpty() ? 0 : 1)
+                                .loanInformation(loanInformation)
+                                .bankRelation(CustomerBankRelation.builder()
+                                                .action("add")
+                                                .relation(accounts.isEmpty() ? null : "01")
+                                                .build())
+                                .build();
+
+                return customerData;
+        }
+
+        private LoanSchedule toLoanSchedule(LoanInstallment loanInstallment) {
+                return LoanSchedule.builder()
+                                .action("add")
+                                .dueDate(loanInstallment.getDueDate() == null ? null
+                                                : loanInstallment.getDueDate().toLocalDate().toString())
+                                .principal(loanInstallment.getPrincipal() == null ? null
+                                                : loanInstallment.getPrincipal().toString())
+                                .interest(loanInstallment.getInterest() == null ? null
+                                                : loanInstallment.getInterest().toString())
+                                .balance(loanInstallment.getAfterBalance() == null ? null
+                                                : loanInstallment.getAfterBalance().toString())
+                                .build();
+        }
 }
