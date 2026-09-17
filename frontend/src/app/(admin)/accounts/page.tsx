@@ -8,10 +8,12 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Notice } from "@/components/ui/Notice";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 
+const PAGE_SIZE = 20;
+
 export default function AccountsPage() {
     const [accounts, setAccounts] = useState<Account[]>([]);
-    const [selectedClientIds, setSelectedClientIds] = useState<string[]>([]);
     const [search, setSearch] = useState("");
+    const [page, setPage] = useState(1);
     const { busy, message, isError, setMessage, run } = useAsyncAction();
 
     const loadAccounts = () =>
@@ -19,19 +21,6 @@ export default function AccountsPage() {
             const result = await api.accounts();
             setAccounts(result);
             setMessage(`${result.length} дансны мэдээлэл ачааллаа.`);
-        });
-
-    const uploadSelectedCustomers = () =>
-        void run(async () => {
-            if (selectedClientIds.length === 0) return;
-            const customers = await api.customersForClients(selectedClientIds);
-            const result = await api.uploadCitizen(customers);
-            setMessage(
-                result.every((item) => item.success)
-                    ? `${result.length} харилцагчийн мэдээллийг амжилттай илгээлээ.`
-                    : "Зарим мэдээллийг илгээх явцад алдаа гарлаа."
-            );
-            if (result.every((item) => item.success)) setSelectedClientIds([]);
         });
 
     useEffect(() => {
@@ -46,31 +35,17 @@ export default function AccountsPage() {
             value.toLowerCase().includes(search.toLowerCase())
         )
     );
-    const visibleClientIds = [...new Set(visibleAccounts.map((account) => account.clientId))];
-    const allVisibleSelected = visibleClientIds.length > 0 && visibleClientIds.every((clientId) => selectedClientIds.includes(clientId));
-    const toggleClient = (clientId: string) =>
-        setSelectedClientIds((selected) => (selected.includes(clientId) ? selected.filter((id) => id !== clientId) : [...selected, clientId]));
-    const toggleAllVisible = () =>
-        setSelectedClientIds((selected) => (allVisibleSelected ? selected.filter((id) => !visibleClientIds.includes(id)) : [...new Set([...selected, ...visibleClientIds])]));
+    const totalPages = Math.max(1, Math.ceil(visibleAccounts.length / PAGE_SIZE));
+    const currentPage = Math.min(page, totalPages);
+    const pagedAccounts = visibleAccounts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     return (
         <>
             <PageHeader breadcrumb="АДМИН / ДАНСНЫ БҮРТГЭЛ" title="Дансны удирдлага" />
 
-            <section className="page-heading">
-                <div>
-                    <h2>Бүртгэлтэй дансууд</h2>
-                    <p>Сонгосон харилцагчийн мэдээллийг Сайн систем рүү багцаар илгээнэ.</p>
-                </div>
-                <button className="primary-button" onClick={uploadSelectedCustomers} disabled={busy || selectedClientIds.length === 0}>
-                    {busy ? "Илгээж байна..." : `Сонгосон ${selectedClientIds.length} харилцагчийг илгээх`}
-                </button>
-            </section>
-
             <section className="summary-grid" aria-label="Дансны товч мэдээлэл">
                 <StatCard label="Нийт данс" value={accounts.length} hint="Ачаалсан бүртгэл" />
                 <StatCard label="Идэвхтэй данс" value={accounts.filter((account) => account.accountStatus === "ACTIVE").length} hint="Боловсруулах боломжтой" />
-                <StatCard label="Сонгосон харилцагч" value={selectedClientIds.length} hint="Багцаар илгээхэд бэлэн" />
             </section>
 
             <section className="inventory-panel">
@@ -82,7 +57,14 @@ export default function AccountsPage() {
                     <div className="toolbar-actions">
                         <label className="search-field">
                             <span>ХАЙХ</span>
-                            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Данс, харилцагч, бүтээгдэхүүн..." />
+                            <input
+                                value={search}
+                                onChange={(event) => {
+                                    setSearch(event.target.value);
+                                    setPage(1);
+                                }}
+                                placeholder="Данс, харилцагч, бүтээгдэхүүн..."
+                            />
                         </label>
                         <button className="outline-button" onClick={loadAccounts} disabled={busy}>
                             Шинэчлэх
@@ -93,9 +75,6 @@ export default function AccountsPage() {
                     <table>
                         <thead>
                             <tr>
-                                <th>
-                                    <input className="row-checkbox" type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Харагдаж буй бүх харилцагчийг сонгох" />
-                                </th>
                                 <th>Дансны дугаар</th>
                                 <th>Харилцагч</th>
                                 <th>Бүтээгдэхүүн</th>
@@ -106,18 +85,9 @@ export default function AccountsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {visibleAccounts.length > 0 ? (
-                                visibleAccounts.map((account) => (
+                            {pagedAccounts.length > 0 ? (
+                                pagedAccounts.map((account) => (
                                     <tr key={account.accountId}>
-                                        <td>
-                                            <input
-                                                className="row-checkbox"
-                                                type="checkbox"
-                                                checked={selectedClientIds.includes(account.clientId)}
-                                                onChange={() => toggleClient(account.clientId)}
-                                                aria-label={`${account.clientId} харилцагчийг сонгох`}
-                                            />
-                                        </td>
                                         <td className="account-id">{account.accountId}</td>
                                         <td>{account.clientId}</td>
                                         <td>{account.productId}</td>
@@ -128,11 +98,27 @@ export default function AccountsPage() {
                                     </tr>
                                 ))
                             ) : (
-                                <tr><td className="empty-state" colSpan={8}>Хайлтад тохирох бүртгэл олдсонгүй.</td></tr>
+                                <tr><td className="empty-state" colSpan={7}>Хайлтад тохирох бүртгэл олдсонгүй.</td></tr>
                             )}
                         </tbody>
                     </table>
                 </div>
+                {visibleAccounts.length > 0 && (
+                    <div className="pagination">
+                        <span>
+                            Нийт {visibleAccounts.length} бүртгэлээс {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, visibleAccounts.length)}-г харуулж байна
+                        </span>
+                        <div className="pagination-controls">
+                            <button className="outline-button" onClick={() => setPage((p) => p - 1)} disabled={currentPage <= 1}>
+                                Өмнөх
+                            </button>
+                            <span className="pagination-current">{currentPage} / {totalPages}</span>
+                            <button className="outline-button" onClick={() => setPage((p) => p + 1)} disabled={currentPage >= totalPages}>
+                                Дараах
+                            </button>
+                        </div>
+                    </div>
+                )}
             </section>
 
             <Notice message={message} tone={isError ? "error" : "info"} />

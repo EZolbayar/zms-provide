@@ -51,9 +51,8 @@ public class ApiController {
     }
 
     @GetMapping("/send-data")
-    public ResponseEntity<HttpResponse<CustomerData>> getCitizenUpload() {
-        CustomerData data = recentlyDataService.buildForRecentlyChangedAccounts().stream().findFirst().orElse(null);
-        return ResponseEntity.ok(HttpResponse.success(data));
+    public ResponseEntity<HttpResponse<List<CustomerData>>> getCitizenUpload() {
+        return ResponseEntity.ok(HttpResponse.success(recentlyDataService.buildForRecentlyChangedAccounts()));
     }
 
     @PostMapping("/send-data")

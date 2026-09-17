@@ -403,6 +403,28 @@ h2 {
   overflow-x: auto;
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+  color: #58708e;
+  font-size: 12px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination-current {
+  font-weight: 800;
+  color: var(--navy);
+}
+
 table {
   width: 100%;
   min-width: 810px;

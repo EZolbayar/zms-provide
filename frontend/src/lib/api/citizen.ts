@@ -27,8 +27,8 @@ const dummyCustomer: CustomerData = {
 };
 
 /** GET /api/send-data - com.example.terguun.conttoller.ApiController#getCitizenUpload */
-export function getLatestCustomer(): Promise<CustomerData | null> {
-    return usingDummyData ? simulate(dummyCustomer) : request<CustomerData | null>("/send-data");
+export function getRecentlyChangedCustomers(): Promise<CustomerData[]> {
+    return usingDummyData ? simulate([dummyCustomer]) : request<CustomerData[]>("/send-data");
 }
 
 /** POST /api/send-data - com.example.terguun.conttoller.ApiController#getCitizenUploadForClients */
@@ -40,6 +40,7 @@ export function getCustomersForClients(clientIds: string[]): Promise<CustomerDat
 
 /** POST /api/upload-citizen - com.example.terguun.conttoller.ApiController#uploadCitizen */
 export function uploadCitizen(data: CustomerData[]): Promise<UploadResult[]> {
+    console.log("Uploading citizen data:", data);
     return usingDummyData
         ? simulate(data.map((item) => ({ success: true, action: String(item.action ?? "add") })))
         : request<UploadResult[]>("/upload-citizen", { method: "POST", body: JSON.stringify({ data }) });

@@ -13,6 +13,10 @@ import com.example.terguun.dto.sain.CustomerData;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Log4j2
 @Service
@@ -20,6 +24,10 @@ import lombok.extern.log4j.Log4j2;
 public class CitizenUploadService {
 
     private final SainServiceClient sainServiceClient;
+
+    private final ObjectMapper sainResponseMapper = JsonMapper.builder()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .build();
 
     @Value("${data.provider.regnum}")
     private String dataProviderRegnum;
@@ -46,15 +54,21 @@ public class CitizenUploadService {
  
         for (CitizenUploadRequest request : citizenUploadRequests) {
             String patchNumber = request.getPatchNumber();
+            String rawBody = null;
             try {
                 log.debug("Citizen upload илгээж байна. patchNumber={}", patchNumber);
-                CitizenUploadResponse response = sainServiceClient.uploadCitizen(request);
-                log.info("Citizen upload амжилттай. patchNumber={}", patchNumber);
-                responses.add(response);
+                rawBody = sainServiceClient.uploadCitizen(request);
+                log.info("Citizen upload хариу ирлээ. patchNumber={}, body={}", patchNumber, rawBody);
+                responses.add(parseResponse(rawBody));
             } catch (Exception ex) {
                 failureCount++;
-                log.error("Citizen upload амжилтгүй боллоо. patchNumber={}, error={}",
-                        patchNumber, ex.getMessage(), ex);
+                log.error("Citizen upload амжилтгүй боллоо. patchNumber={}, body={}, error={}",
+                        patchNumber, rawBody, ex.getMessage(), ex);
+                // Always add one response per request so the caller can zip requests/responses by index.
+                responses.add(CitizenUploadResponse.builder()
+                        .success(false)
+                        .errors(new String[] { ex.getMessage() })
+                        .build());
             }
         }
  
@@ -63,6 +77,21 @@ public class CitizenUploadService {
  
         return responses;
 
+    }
+
+    /** Sain returns either a single object or a one-element array, so both shapes are accepted. */
+    private CitizenUploadResponse parseResponse(String rawBody) {
+        if (rawBody == null || rawBody.isBlank()) {
+            return CitizenUploadResponse.builder().success(true).build();
+        }
+        JsonNode node = sainResponseMapper.readTree(rawBody);
+        if (node.isArray()) {
+            node = node.isEmpty() ? null : node.get(0);
+        }
+        if (node == null || node.isNull()) {
+            return CitizenUploadResponse.builder().success(true).build();
+        }
+        return sainResponseMapper.treeToValue(node, CitizenUploadResponse.class);
     }
 
 }

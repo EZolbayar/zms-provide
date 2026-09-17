@@ -20,7 +20,7 @@ export default function DashboardPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const activeAccounts = accounts.filter((account) => account.accountStatus === "ACTIVE");
+    const activeAccounts = accounts.filter((account) => account.accountStatus === "A");
     const totalBalance = activeAccounts.reduce((sum, account) => sum + Number(account.balance ?? 0), 0);
     const recentAccounts = [...accounts]
         .sort((a, b) => (a.openDate < b.openDate ? 1 : -1))

@@ -1,5 +1,6 @@
 package com.example.terguun.dto.sain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -11,10 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CitizenUploadResponse {
 
+    // Wrapper type: Sain occasionally returns "success": null, which fails to bind into a primitive boolean.
     @JsonProperty("success")
-    private boolean success;
+    private Boolean success;
 
     @JsonProperty("errors")
     private String[] errors;

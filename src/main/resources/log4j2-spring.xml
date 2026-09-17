@@ -9,6 +9,10 @@
         <Logger name="com.example.zms_upload" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
+        <!-- Logs the full Sain request/response bodies (Feign Logger.Level.FULL only emits at DEBUG). -->
+        <Logger name="com.example.terguun.client.SainServiceClient" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
