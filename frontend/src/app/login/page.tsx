@@ -32,7 +32,7 @@ export default function LoginPage() {
             <div className="login-card">
                 <div className="brand">
                     <span className="brand-mark">T</span>
-                    <span>TERGUUN</span>
+                    <span>Тэргүүн ембүү ББСБ</span>
                 </div>
                 <h1>Тавтай морил</h1>
                 <p className="login-subtitle">Дансны бүртгэл, харилцагчийн мэдээллийг удирдах системд нэвтэрнэ үү.</p>

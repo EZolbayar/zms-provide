@@ -1,8 +1,10 @@
 package com.example.terguun.dto.sain;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -76,7 +78,8 @@ private String action;
     private BigDecimal bondUnitPrice;
  
     @JsonProperty("o_c_loan_starteddate")
-    private LocalDate startedDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startedDate;
  
     @JsonProperty("o_c_loan_expdate")
     private LocalDate expDate;

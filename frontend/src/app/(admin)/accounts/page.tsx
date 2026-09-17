@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Notice } from "@/components/ui/Notice";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default function AccountsPage() {
     const [accounts, setAccounts] = useState<Account[]>([]);
@@ -45,7 +45,7 @@ export default function AccountsPage() {
 
             <section className="summary-grid" aria-label="Дансны товч мэдээлэл">
                 <StatCard label="Нийт данс" value={accounts.length} hint="Ачаалсан бүртгэл" />
-                <StatCard label="Идэвхтэй данс" value={accounts.filter((account) => account.accountStatus === "ACTIVE").length} hint="Боловсруулах боломжтой" />
+                <StatCard label="Идэвхтэй данс" value={accounts.filter((account) => account.accountStatus === "A").length} hint="Боловсруулах боломжтой" />
             </section>
 
             <section className="inventory-panel">

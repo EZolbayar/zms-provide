@@ -183,7 +183,7 @@ export default function CitizenUploadPage() {
                             <input
                                 value={clientIdsInput}
                                 onChange={(event) => setClientIdsInput(event.target.value)}
-                                placeholder="C-100238, C-100411"
+                                placeholder="100238, 100411"
                             />
                         </label>
                         <button className="primary-button" onClick={fetchCustomers} disabled={busy}>

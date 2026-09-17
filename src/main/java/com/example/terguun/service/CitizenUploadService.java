@@ -58,7 +58,6 @@ public class CitizenUploadService {
             try {
                 log.debug("Citizen upload илгээж байна. patchNumber={}", patchNumber);
                 rawBody = sainServiceClient.uploadCitizen(request);
-                log.info("Citizen upload хариу ирлээ. patchNumber={}, body={}", patchNumber, rawBody);
                 responses.add(parseResponse(rawBody));
             } catch (Exception ex) {
                 failureCount++;

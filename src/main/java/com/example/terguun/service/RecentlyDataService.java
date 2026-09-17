@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,10 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class RecentlyDataService {
+
+        // "<аймаг/хот> аймаг|хот <сум/дүүрэг> сум|дүүрэг <баг>-р баг <гудамж> <байр>" хэлбэрийн хаягийг задлана.
+        private static final Pattern ADDRESS_PATTERN = Pattern.compile(
+                        "^(?<aimag>.+?(?:аймаг|хот))\\s+(?<soum>.+?(?:сум|дүүрэг))\\s+(?<bag>.+?(?:баг|хороо))\\s+(?<street>\\S+)\\s+(?<apartment>.+)$");
 
         @Value("${look.back.hours}")
         private int lookbackHours;
@@ -107,8 +113,7 @@ public class RecentlyDataService {
                                                 .interestBalanceLcy(loanAccount.getInterestBalance())
                                                 .additionalInterestBalanceLcy(loanAccount.getPenaltyBalance())
                                                 .interestRate(loanAccount.getInterestRate())
-                                                .startedDate(loanAccount.getOpenDate() == null ? null
-                                                                : loanAccount.getOpenDate().toLocalDate())
+                                                .startedDate(loanAccount.getOpenDate())
                                                 .expDate(loanAccount.getMatureDate() == null ? null
                                                                 : loanAccount.getMatureDate().toLocalDate())
                                                 .status(loanAccount.getAccountStatus())
@@ -122,22 +127,23 @@ public class RecentlyDataService {
 
                 CustomerData customerData = CustomerData.builder()
                                 .action("add")
-                                .civilId(client.getNationalId())
+                                .civilId("888954521912")
                                 .regnum(client.getPinId())
                                 .customerName(client.getClientName())
                                 .lastname(client.getFirstName())
                                 .familyname(client.getFamilyName())
                                 .isForeign(0)
                                 .birthdate(client.getBirthDate())
-                                .address(CustomerAddress.builder()
-                                                .addressFull(client.getAddress1())
-                                                .apartmentName(client.getAddress2())
-                                                .build())
+                                .address(parseAddress(client.getAddress1()))
                                 .phone(client.getPhone1())
-                                .email(client.getEmail())
+                                .email(client.getEmail() == null || client.getEmail().isBlank()
+                                                ? "nomail@gmail.com"
+                                                : client.getEmail())
                                 .taxNumber(client.getOrgPinId())
+                                // TBCLIENTS-д гэр бүлийн гишүүдийн тоо талбар байхгүй тул одоогоор хоосон
+                                .familyNumOfMembers(2)
                                 .isEmployed(activeInstallments.isEmpty() ? 0 : 1)
-                                .loanInformation(loanInformation)
+                                .loanInformation(loanInformation == null ? null : List.of(loanInformation))
                                 .bankRelation(CustomerBankRelation.builder()
                                                 .action("add")
                                                 .relation(accounts.isEmpty() ? null : "01")
@@ -145,6 +151,20 @@ public class RecentlyDataService {
                                 .build();
 
                 return customerData;
+        }
+
+        private CustomerAddress parseAddress(String addressFull) {
+                CustomerAddress.CustomerAddressBuilder address = CustomerAddress.builder().addressFull(addressFull);
+                Matcher matcher = addressFull == null ? null : ADDRESS_PATTERN.matcher(addressFull.trim());
+                if (matcher != null && matcher.matches()) {
+                        address.aimagCityName(matcher.group("aimag"))
+                                        .soumDistrictName(matcher.group("soum"))
+                                        .bagKhorooName(matcher.group("bag"))
+                                        .streetName(matcher.group("street"))
+                                        .apartmentName(matcher.group("apartment"));
+                }
+                // TBCLIENTS-д aimag/soum/bag khoroo кодууд тусад нь баганагүй тул одоогоор хоосон
+                return address.build();
         }
 
         private LoanSchedule toLoanSchedule(LoanInstallment loanInstallment) {

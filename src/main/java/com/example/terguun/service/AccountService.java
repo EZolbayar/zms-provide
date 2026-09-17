@@ -3,6 +3,7 @@ package com.example.terguun.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.terguun.dto.AccountDto;
@@ -19,7 +20,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
     public List<AccountDto> getAll() {
-        return accountRepository.findAll().stream()
+        return accountRepository.findAll(Sort.by(Sort.Direction.DESC, "createdOn")).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }

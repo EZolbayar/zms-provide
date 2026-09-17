@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 @Data
 @Builder(toBuilder = true)
@@ -19,7 +20,9 @@ public class CitizenUploadResponse {
     @JsonProperty("success")
     private Boolean success;
 
+    // Sain "errors"-ыг массив, объект эсвэл ганц текстээр буцаадаг.
     @JsonProperty("errors")
+    @JsonDeserialize(using = FlexibleStringArrayDeserializer.class)
     private String[] errors;
 
     @JsonProperty("action")

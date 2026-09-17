@@ -14,7 +14,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
     { href: "/dashboard", label: "Хянах самбар" },
     { href: "/accounts", label: "Дансны бүртгэл" },
-    { href: "/citizen-upload", label: "Иргэний мэдээлэл" },
+    { href: "/citizen-upload", label: "Нийлүүлэх мэдээлэл" },
 ];
 
 export function Sidebar({ user }: { user: Session | null }) {
@@ -24,7 +24,7 @@ export function Sidebar({ user }: { user: Session | null }) {
         <aside className="sidebar">
             <div className="brand">
                 <span className="brand-mark">T</span>
-                <span>TERGUUN</span>
+                <span>Тэргүүн ембүү ББСБ</span>
             </div>
             <p className="menu-label">УДИРДЛАГЫН САМБАР</p>
             <nav aria-label="Үндсэн цэс">

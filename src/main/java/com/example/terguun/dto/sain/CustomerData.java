@@ -1,7 +1,9 @@
 package com.example.terguun.dto.sain;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -36,6 +38,7 @@ public class CustomerData {
     private Integer isForeign;
 
     @JsonProperty("o_c_birthdate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
     @JsonProperty("o_c_address")
@@ -63,20 +66,20 @@ public class CustomerData {
     private CustomerJob job;
 
     @JsonProperty("o_c_related_org")
-    private RelatedOrg relatedOrg;
+    private List<RelatedOrg> relatedOrg;
 
     @JsonProperty("o_c_related_customer")
-    private RelatedCustomer relatedCustomer;
+    private List<RelatedCustomer> relatedCustomer;
 
     @JsonProperty("o_c_customer_bank_relation")
     private CustomerBankRelation bankRelation;
 
     @JsonProperty("o_c_loan_information")
-    private LoanInformation loanInformation;
+    private List<LoanInformation> loanInformation;
 
     @JsonProperty("o_c_loanline")
-    private LoanLineData loanLineData;
+    private List<LoanLineData> loanLineData;
 
     @JsonProperty("o_c_coll_information")
-    private CollateralInformation collateralInformation;
+    private List<CollateralInformation> collateralInformation;
 }
