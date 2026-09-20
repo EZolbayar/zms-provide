@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function LoginPage() {
+function LoginForm() {
     const { signIn } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -53,5 +53,14 @@ export default function LoginPage() {
                 <p className="login-hint">Демо орчинд <strong>admin</strong> / хамаагүй нууц үг ашиглан нэвтэрч болно.</p>
             </div>
         </main>
+    );
+}
+
+// useSearchParams нь статик export-д Suspense хил шаарддаг.
+export default function LoginPage() {
+    return (
+        <Suspense fallback={null}>
+            <LoginForm />
+        </Suspense>
     );
 }

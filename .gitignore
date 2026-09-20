@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Release build: frontend export copied here
+src/main/resources/static/
+frontend/out/
+dist/
