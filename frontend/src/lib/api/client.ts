@@ -13,8 +13,9 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     let response: Response;
     try {
         response = await fetch(`${API_BASE_URL}/api${path}`, {
-            headers: { "Content-Type": "application/json", ...init?.headers },
             ...init,
+            // init-ийн дараа байрлуулснаар дуудагчийн header-үүд Content-Type-г дарж бичихгүй.
+            headers: { "Content-Type": "application/json", ...init?.headers },
         });
     } catch {
         throw new ApiError(`${API_BASE_URL} хаягт холбогдож чадсангүй. NEXT_PUBLIC_API_BASE_URL болон API серверээ шалгана уу.`);

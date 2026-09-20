@@ -13,6 +13,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
     { href: "/dashboard", label: "Хянах самбар" },
+    { href: "/customers", label: "Харилцагчийн бүртгэл" },
     { href: "/accounts", label: "Дансны бүртгэл" },
     { href: "/citizen-upload", label: "Нийлүүлэх мэдээлэл" },
 ];

@@ -5,9 +5,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,20 +15,23 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "TBLOANINSTALLMENTS")
+@IdClass(LoanInstallmentId.class)
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoanInstallment {
 
+    // INSTALLMENTID нь 1 = эхний төлөлт, 2 = хоёр дахь төлөлт гэх мэт дараалал бөгөөд данс тус бүрд
+    // дахин 1-ээс эхэлдэг тул ACCOUNTID-тай хослон мөрийг заана.
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ACCOUNTID")
+    private String accountId;
+    @Id
     @Column(name = "INSTALLMENTID")
     private Long installmentId;
     @Column(name = "BRANCHID")
     private String branchId;
-    @Column(name = "ACCOUNTID")
-    private String accountId;
     @Column(name = "ISACTIVE")
     private Boolean isActive;
     @Column(name = "DUEDATE")

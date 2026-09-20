@@ -52,9 +52,9 @@ export default function AccountsPage() {
                 <div className="panel-toolbar">
                     <div>
                         <h3>Дансны жагсаалт</h3>
-                        <p>ZMS-д бүртгэлтэй бүх данс</p>
+                        <p>Бүртгэлтэй бүх данс</p>
                     </div>
-                    <div className="toolbar-actions">
+                    <div className="toolbar-actions">   
                         <label className="search-field">
                             <span>ХАЙХ</span>
                             <input

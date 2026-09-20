@@ -7,11 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Хуулийн этгээдийн хаяг (протокол 2.4). Иргэний бүтцээс ганцхан ялгаатай: байрны талбар нь
+ * o_c_address_apartment_name (иргэнийх o_c_address_apartment_name_number) тул тусад нь DTO болгов.
+ */
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerAddress {
+public class EntityAddress {
 
     @JsonProperty("o_c_address_full")
     private String addressFull;
@@ -43,7 +47,7 @@ public class CustomerAddress {
     @JsonProperty("o_c_address_town_name")
     private String townName;
 
-    @JsonProperty("o_c_address_apartment_name_number")
+    @JsonProperty("o_c_address_apartment_name")
     private String apartmentName;
 
     @JsonProperty("o_c_address_zipcode")

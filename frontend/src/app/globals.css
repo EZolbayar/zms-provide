@@ -544,6 +544,121 @@ tbody tr:last-child td {
   align-items: flex-end;
 }
 
+/* ---------- Tab цэс (Шинэ / Хуучин) ---------- */
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab-button {
+  margin-bottom: -1px;
+  padding: 9px 20px;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  color: var(--muted);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.tab-button:hover:not(:disabled):not(.active) {
+  color: var(--navy);
+}
+
+.tab-button.active {
+  border-color: var(--line);
+  border-bottom-color: #fff;
+  color: var(--blue-deep);
+  background: #fff;
+}
+
+/* ---------- Харилцагч бүртгэх маягт ---------- */
+
+.customer-form {
+  margin-top: 18px;
+  display: grid;
+  gap: 18px;
+}
+
+.customer-form fieldset {
+  margin: 0;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.customer-form legend {
+  padding: 0 8px;
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px 18px;
+}
+
+.form-grid label {
+  display: grid;
+  gap: 6px;
+  color: #385270;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid #c6d3e6;
+  border-radius: 6px;
+  outline-color: var(--blue);
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.form-span-2 {
+  grid-column: 1 / -1;
+}
+
+.form-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #385270;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.check-field input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--blue);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
 /* ---------- Notices ---------- */
 
 .notice {
@@ -771,4 +886,30 @@ tbody tr:last-child td {
   .search-field input {
     width: 100%;
   }
+}
+
+/* ---------- Өөрчлөлтийн төрлийн тэмдэглэгээ ---------- */
+
+.change-tag {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.change-new_loan {
+  color: #1d4ed8;
+  background: #e0ecff;
+}
+
+.change-closed_loan {
+  color: #6b21a8;
+  background: #f1e5fd;
+}
+
+.change-repayment {
+  color: var(--success);
+  background: #dff5ec;
 }
