@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { api, CLIENT_TYPE_CITIZEN, CLIENT_TYPE_LEGAL_ENTITY, type Customer, type CustomerRegistration } from "@/lib/api";
+import { useEffect, useMemo, useState } from "react";
+import { api, CLIENT_TYPE_CITIZEN, CLIENT_TYPE_LEGAL_ENTITY, type AddressMapping, type Customer, type CustomerRegistration } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Notice } from "@/components/ui/Notice";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,6 +53,7 @@ function clientTypeLabel(clientType?: string) {
 export default function CustomersPage() {
     const { user } = useAuth();
     const [customers, setCustomers] = useState<Customer[]>([]);
+    const [addressMapping, setAddressMapping] = useState<AddressMapping[]>([]);
     const [form, setForm] = useState<CustomerRegistration>(EMPTY_FORM);
     const [formOpen, setFormOpen] = useState(false);
     const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
@@ -72,10 +73,53 @@ export default function CustomersPage() {
 
     useEffect(() => {
         void runList(async () => {
-            setCustomers(await api.customers());
+            const [customerList, mapping] = await Promise.all([api.customers(), api.addressMapping()]);
+            setCustomers(customerList);
+            setAddressMapping(mapping);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // ADDRESS_MAPPING лавлахаас аймаг/хот болон сонгосон аймгийн сум/дүүргүүд.
+    const cityNames = useMemo(
+        () => [...new Set(addressMapping.map((row) => row.cityName ?? "").filter(Boolean))].sort((a, b) => a.localeCompare(b, "mn")),
+        [addressMapping],
+    );
+    // Засах үед хадгалсан ХУР кодоор (аймаг + сум хос, сумын код дангаараа давхцдаг), олдохгүй бол нэрээр тааруулна.
+    const selectedDistrict = addressMapping.find(
+        (row) =>
+            (form.aimagCityCode && form.soumDistrictCode && row.cityCodeXyp === form.aimagCityCode && row.districtCodeXyp === form.soumDistrictCode) ||
+            (row.cityName === form.aimagCityName && row.districtName === form.soumDistrictName),
+    );
+    const selectedCity = selectedDistrict?.cityName ?? (cityNames.includes(form.aimagCityName ?? "") ? (form.aimagCityName ?? "") : "");
+    const districtOptions = useMemo(
+        () =>
+            addressMapping
+                .filter((row) => row.cityName === selectedCity && row.districtName)
+                .sort((a, b) => (a.districtName ?? "").localeCompare(b.districtName ?? "", "mn")),
+        [addressMapping, selectedCity],
+    );
+
+    const selectCity = (cityName: string) =>
+        setForm((current) => ({
+            ...current,
+            aimagCityName: cityName,
+            aimagCityCode: addressMapping.find((row) => row.cityName === cityName)?.cityCodeXyp ?? "",
+            soumDistrictName: "",
+            soumDistrictCode: "",
+        }));
+
+    // Сонголтын утга нь давхцалгүй үндсэн DISTRICT_CODE, харин хадгалахдаа ХУР (*_XYP) кодыг бичнэ.
+    const selectDistrict = (districtCode: string) => {
+        const row = addressMapping.find((item) => item.districtCode === districtCode);
+        setForm((current) => ({
+            ...current,
+            aimagCityName: row?.cityName ?? current.aimagCityName,
+            aimagCityCode: row?.cityCodeXyp ?? current.aimagCityCode,
+            soumDistrictName: row?.districtName ?? "",
+            soumDistrictCode: row?.districtCodeXyp ?? "",
+        }));
+    };
 
     const setField = <K extends keyof CustomerRegistration>(field: K, value: CustomerRegistration[K]) =>
         setForm((current) => ({ ...current, [field]: value }));
@@ -220,11 +264,15 @@ export default function CustomersPage() {
                                     <>
                                         <label>
                                             <span>ОВОГ *</span>
-                                            <input value={form.familyName ?? ""} onChange={(event) => setField("familyName", event.target.value)} required />
+                                            <input value={form.firstName ?? ""} onChange={(event) => setField("firstName", event.target.value)} required />
                                         </label>
                                         <label>
                                             <span>НЭР *</span>
-                                            <input value={form.firstName ?? ""} onChange={(event) => setField("firstName", event.target.value)} />
+                                            <input value={form.clientName ?? ""} onChange={(event) => setField("clientName", event.target.value)} required />
+                                        </label>
+                                        <label>
+                                            <span>УРГИЙН ОВОГ</span>
+                                            <input value={form.familyName ?? ""} onChange={(event) => setField("familyName", event.target.value)} />
                                         </label>
                                         <label>
                                             <span>ИРГЭНИЙ БҮРТГЭЛИЙН ДУГААР *</span>
@@ -262,11 +310,25 @@ export default function CustomersPage() {
                             <div className="form-grid">
                                 <label>
                                     <span>АЙМАГ / ХОТ *</span>
-                                    <input value={form.aimagCityName ?? ""} onChange={(event) => setField("aimagCityName", event.target.value)} placeholder="Улаанбаатар хот" required />
+                                    <select value={selectedCity} onChange={(event) => selectCity(event.target.value)} required>
+                                        <option value="">— Сонгоно уу —</option>
+                                        {cityNames.map((name) => (
+                                            <option key={name} value={name}>
+                                                {name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </label>
                                 <label>
                                     <span>СУМ / ДҮҮРЭГ *</span>
-                                    <input value={form.soumDistrictName ?? ""} onChange={(event) => setField("soumDistrictName", event.target.value)} placeholder="Сүхбаатар дүүрэг" required />
+                                    <select value={selectedDistrict?.districtCode ?? ""} onChange={(event) => selectDistrict(event.target.value)} disabled={!selectedCity} required>
+                                        <option value="">{selectedCity ? "— Сонгоно уу —" : "Эхлээд аймаг / хот сонгоно уу"}</option>
+                                        {districtOptions.map((row) => (
+                                            <option key={row.districtCode} value={row.districtCode}>
+                                                {row.districtName}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </label>
                                 <label>
                                     <span>БАГ / ХОРОО *</span>

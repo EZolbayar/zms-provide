@@ -1,5 +1,6 @@
 package com.example.terguun.dto.sain;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,10 +19,12 @@ public class LoanSchedule {
     @JsonProperty("o_c_schedule_principal")
     private String principal;
     @JsonProperty("o_c_schedule_interest")
+    @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String interest;
     @JsonProperty("o_c_schedule_additional")
     private String additional;
     @JsonProperty("o_c_schedule_balance")
+    @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String balance;
 
 }
