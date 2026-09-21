@@ -21,7 +21,9 @@ import com.example.terguun.dto.RecentUploadItem;
 import com.example.terguun.dto.UploadRequest;
 import com.example.terguun.dto.sain.CitizenUploadResponse;
 import com.example.terguun.dto.sain.CustomerData;
+import com.example.terguun.model.AddressMapping;
 import com.example.terguun.service.AccountService;
+import com.example.terguun.service.AddressMappingService;
 import com.example.terguun.service.CustomerService;
 import com.example.terguun.service.LoginService;
 import com.example.terguun.service.RecentlyDataService;
@@ -39,6 +41,7 @@ public class ApiController {
     private final RecentlyDataService recentlyDataService;
     private final SainUploadService sainUploadService;
     private final CustomerService customerService;
+    private final AddressMappingService addressMappingService;
 
     @PostMapping("/login")
     public ResponseEntity<HttpResponse<Login.Response>> login(@RequestBody Login.Request request) {
@@ -82,6 +85,12 @@ public class ApiController {
             @RequestHeader(value = "X-User-Id", required = false) String userId) {
         return ResponseEntity.ok(HttpResponse.success(sainUploadService
                 .upload(recentlyDataService.buildForUpload(items), userId)));
+    }
+
+    /** Хаягийн лавлах: харилцагч бүртгэх формын аймаг/хот, сум/дүүргийн сонголт. */
+    @GetMapping("/address-mapping")
+    public ResponseEntity<HttpResponse<List<AddressMapping>>> getAddressMapping() {
+        return ResponseEntity.ok(HttpResponse.success(addressMappingService.getAll()));
     }
 
     @GetMapping("/customers")

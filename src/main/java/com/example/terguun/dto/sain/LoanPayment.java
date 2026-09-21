@@ -1,5 +1,6 @@
 package com.example.terguun.dto.sain;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class LoanPayment {
     @JsonProperty("o_c_payment_principal")
     private String principal;
     @JsonProperty("o_c_payment_interest")
+    @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String interest;
     @JsonProperty("o_c_payment_additional")
     private String additional;

@@ -37,6 +37,7 @@ public class CustomerService {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
     private final CustomerRepository customerRepository;
+    private final AddressMappingService addressMappingService;
 
     public List<CustomerDto> getAll() {
         return customerRepository.findAllByOrderByCreatedOnDesc().stream()
@@ -137,6 +138,16 @@ public class CustomerService {
         customer.setBagKhorooCode(trimToNull(request.getBagKhorooCode()));
         customer.setStreetName(trimToNull(request.getStreetName()));
 
+        // Аймаг/хот, сум/дүүргийн кодыг ADDRESS_MAPPING лавлахын ХУР (*_XYP) кодоор хадгална.
+        addressMappingService.findByNames(customer.getAimagCityName(), customer.getSoumDistrictName())
+                .ifPresent(row -> {
+                    customer.setAimagCityCode(trimToNull(row.getCityCodeXyp()));
+                    customer.setSoumDistrictCode(trimToNull(row.getDistrictCodeXyp()));
+                    if (customer.getBagKhorooCode() == null) {
+                        customer.setBagKhorooCode(trimToNull(row.getBagkhorooCodeXyp()));
+                    }
+                });
+
         if (customer.getAddress1() == null) {
             customer.setAddress1(composeAddress(customer));
         }
@@ -169,10 +180,10 @@ public class CustomerService {
             }
         } else if (CLIENT_TYPE_CITIZEN.equals(clientType)) {
             if (trimToNull(request.getFirstName()) == null) {
-                throw new BadRequestException("Харилцагчийн нэрийг оруулна уу");
-            }
-            if (trimToNull(request.getFamilyName()) == null) {
                 throw new BadRequestException("Овгийг оруулна уу");
+            }
+            if (trimToNull(request.getClientName()) == null) {
+                throw new BadRequestException("Харилцагчийн нэрийг оруулна уу");
             }
             if (request.getBirthDate() == null) {
                 throw new BadRequestException("Төрсөн огноог оруулна уу");

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Data
 @Builder(toBuilder = true)
@@ -24,6 +25,7 @@ private String action;
     private LocalDate contractDate;
  
     @JsonProperty("o_c_loan_contractno")
+    @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String contractNo;
  
     @JsonProperty("o_c_loan_contract_change_reason")
@@ -63,6 +65,7 @@ private String action;
     private BigDecimal additionalInterestBalanceFcy;
  
     @JsonProperty("o_c_loan_currency_rate")
+    @JsonSerialize(nullsUsing = DashIfNullSerializer.class)
     private BigDecimal currencyRate;
  
     @JsonProperty("o_c_loan_loan_provenance")
@@ -82,9 +85,11 @@ private String action;
     private LocalDateTime startedDate;
  
     @JsonProperty("o_c_loan_expdate")
+    @JsonSerialize(nullsUsing = DashIfNullSerializer.class)
     private LocalDate expDate;
  
     @JsonProperty("o_c_loan_status")
+    @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String status;
  
     @JsonProperty("o_c_loan_decide_status")
@@ -97,6 +102,7 @@ private String action;
     private String currency;
  
     @JsonProperty("o_c_loan_sector")
+    // @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String sector;
  
     @JsonProperty("o_c_loan_interest_rate")
@@ -112,9 +118,11 @@ private String action;
     private BigDecimal fee;
  
     @JsonProperty("o_c_loan_class")
+    @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String loanClass;
  
     @JsonProperty("o_c_loan_type")
+    // @JsonSerialize(using = DashIfBlankSerializer.class, nullsUsing = DashIfNullSerializer.class)
     private String type;
  
     @JsonProperty("o_c_loan_line_contractno")

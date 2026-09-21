@@ -203,3 +203,16 @@ export const CHANGE_TYPE_LABELS: Record<ChangeType, string> = {
     CLOSED_LOAN: "Зээл хаах",
     REPAYMENT: "Эргэн төлөлт",
 };
+
+/** com.example.terguun.model.AddressMapping - хаягийн лавлах (аймаг/хот → сум/дүүрэг) */
+export type AddressMapping = {
+    cityCode?: string;
+    cityCodeXyp?: string;
+    cityName?: string;
+    districtCode: string;
+    districtCodeXyp?: string;
+    districtName?: string;
+    bagkhorooCode?: string;
+    bagkhorooCodeXyp?: string;
+    bagkhorooName?: string;
+};

@@ -1,6 +1,7 @@
 package com.example.terguun.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,8 +15,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,12 +29,12 @@ import com.example.terguun.dto.sain.CustomerBankRelation;
 import com.example.terguun.dto.sain.CustomerData;
 import com.example.terguun.dto.sain.EntityAddress;
 import com.example.terguun.dto.sain.EntityData;
-import com.example.terguun.dto.sain.OrgCeo;
-import com.example.terguun.dto.sain.OrgRate;
 import com.example.terguun.dto.sain.LoanInformation;
 import com.example.terguun.dto.sain.LoanPayment;
 import com.example.terguun.dto.sain.LoanSchedule;
 import com.example.terguun.dto.sain.LoanTransactions;
+import com.example.terguun.dto.sain.OrgCeo;
+import com.example.terguun.dto.sain.OrgRate;
 import com.example.terguun.exception.ResourceNotFoundException;
 import com.example.terguun.model.Account;
 import com.example.terguun.model.Customer;
@@ -54,15 +53,20 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class RecentlyDataService {
 
-        // "<аймаг/хот> аймаг|хот <сум/дүүрэг> сум|дүүрэг <баг>-р баг <гудамж> <байр>" хэлбэрийн хаягийг задлана.
-        private static final Pattern ADDRESS_PATTERN = Pattern.compile(
-                        "^(?<aimag>.+?(?:аймаг|хот))\\s+(?<soum>.+?(?:сум|дүүрэг))\\s+(?<bag>.+?(?:баг|хороо))\\s+(?<street>\\S+)\\s+(?<apartment>.+)$");
-
         /** TBACCOUNTS.AccountStatus-ийн хаагдсан дансны утга. */
         private static final String ACCOUNT_STATUS_CLOSED = "C";
 
         /** TBACCOUNTS.AccountStatus-ийн идэвхтэй дансны утга. */
         private static final String ACCOUNT_STATUS_ACTIVE = "A";
+
+        /** ЗМС-ийн зээлийн гэрээний дугаарын хамгийн бага урт. */
+        private static final int CONTRACT_NO_MIN_LENGTH = 10;
+
+        /** Мөнгөн дүнгийн 0 утга, таслалаас хойш 2 оронтой. */
+        private static final BigDecimal AMOUNT_ZERO = new BigDecimal("0.00");
+
+        /** ЗМС рүү илгээхэд эх сангаас олдоогүй заавал текст талбарын орлуулах утга. */
+        private static final String MISSING = "-";
 
         // Протокол 10.2: YYYY-MM-DD HH:mm:ss.SSSSSS
         private static final DateTimeFormatter PAYMENT_DATE_FORMAT = DateTimeFormatter
@@ -356,31 +360,30 @@ public class RecentlyDataService {
                                                                 : loanAccount.getOpenDate().toLocalDate())
                                                 // Протокол 7.3: зээлийн дансны дугаар байхгүй бол давхардахгүй код үүсгэнэ гэсэн тул
                                                 // TBACCOUNTS.ContractId хоосон үед дансны дугаарыг ашиглана.
-                                                .contractNo(firstNotBlank(loanAccount.getContractId(),
-                                                                loanAccount.getAccountId()))
-                                                .amountLcy(zeroIfNull(loanAccount.getAppliedAmount()))
-                                                .balanceLcy(zeroIfNull(loanAccount.getBalance()))
-                                                .interestBalanceLcy(zeroIfNull(loanAccount.getInterestBalance()))
-                                                .additionalInterestBalanceLcy(zeroIfNull(loanAccount.getPenaltyBalance()))
+                                                .contractNo(contractNo(firstNotBlank(loanAccount.getContractId(),
+                                                                loanAccount.getAccountId())))
+                                                .amountLcy(amount(loanAccount.getAppliedAmount()))
+                                                .balanceLcy(amount(loanAccount.getBalance()))
+                                                .interestBalanceLcy(amount(loanAccount.getInterestBalance()))
+                                                .additionalInterestBalanceLcy(amount(loanAccount.getPenaltyBalance()))
                                                 // Зээлүүд төгрөгөөр олгогддог тул валютын дүнгүүд 0, ханш 1 байна.
-                                                .amountFcy(BigDecimal.ZERO)
-                                                .balanceFcy(BigDecimal.ZERO)
-                                                .interestBalanceFcy(BigDecimal.ZERO)
-                                                .additionalInterestBalanceFcy(BigDecimal.ZERO)
-                                                .currencyRate(BigDecimal.ONE)
+                                                .amountFcy(AMOUNT_ZERO)
+                                                .balanceFcy(AMOUNT_ZERO)
+                                                .interestBalanceFcy(AMOUNT_ZERO)
+                                                .additionalInterestBalanceFcy(AMOUNT_ZERO)
+                                                .currencyRate(amount(BigDecimal.ONE))
                                                 .currency(loanCurrency)
                                                 .loanProvenance(loanProvenance)
                                                 .sector(loanSector)
                                                 .loanClass(loanClass)
                                                 .type(loanTypeCode)
-                                                .interestRate(zeroIfNull(loanAccount.getInterestRate()))
-                                                .additionalInterestRate(zeroIfNull(loanAccount.getExcessRate()))
+                                                .interestRate(amount(loanAccount.getInterestRate()))
+                                                .additionalInterestRate(amount(loanAccount.getExcessRate()))
                                                 // TBACCOUNTS-д шимтгэл, хураамжийн багана байхгүй тул 0.
-                                                .commission(BigDecimal.ZERO)
-                                                .fee(BigDecimal.ZERO)
+                                                .commission(AMOUNT_ZERO)
+                                                .fee(AMOUNT_ZERO)
                                                 .startedDate(loanAccount.getOpenDate())
-                                                .expDate(loanAccount.getMatureDate() == null ? null
-                                                                : loanAccount.getMatureDate().toLocalDate())
+                                                .expDate(maturityDate(loanAccount))
                                                 .status(closed ? loanStatusClosed : loanStatusActive)
                                                 // Протокол 7.24, 7.25: зээл хаах үед л бөглөнө.
                                                 .decideStatus(closed ? loanDecideStatus : null)
@@ -417,13 +420,13 @@ public class RecentlyDataService {
                 return EntityData.builder()
                                 .action("add")
                                 // TBCUSTOMERS-д улсын бүртгэлийн дугаарын багана байхгүй.
-                                .stateRegnum(null)
+                                .stateRegnum(MISSING)
                                 .regnum(customer.getOrgPinId())
-                                .customerName(customer.getClientName())
+                                .customerName(dashIfBlank(customer.getClientName()))
                                 .isForeign(0)
                                 .birthdate(customer.getBirthDate())
                                 .address(buildEntityAddress(customer))
-                                .phone(firstNotBlank(customer.getMobile(), customer.getPhone1()))
+                                .phone(dashIfBlank(firstNotBlank(customer.getMobile(), customer.getPhone1())))
                                 .email(customer.getEmail() == null || customer.getEmail().isBlank()
                                                 ? "nomail@gmail.com"
                                                 : customer.getEmail())
@@ -431,11 +434,15 @@ public class RecentlyDataService {
                                 .companyType(orgCompanyType)
                                 .orgRate(OrgRate.builder()
                                                 .agency(orgRateAgency)
-                                                .rating(orgRateValue)
+                                                .rating(orgRateValue == null ? "0.0" : orgRateValue)
                                                 .build())
                                 // TBCUSTOMERS-д зөвхөн DIRECTORNAME байгаа тул бусад талбар хоосон.
                                 .ceo(OrgCeo.builder()
-                                                .firstname(customer.getDirectorName())
+                                                .firstname(dashIfBlank(customer.getDirectorName()))
+                                                .lastname(MISSING)
+                                                .familyname(MISSING)
+                                                .address(MISSING)
+                                                .phone(MISSING)
                                                 .isForeign(0)
                                                 .build())
                                 .numOfShareholderOrg(0)
@@ -482,13 +489,13 @@ public class RecentlyDataService {
                                 .action("add")
                                 .civilId(customer.getCivilId())
                                 .regnum(customer.getPinId())
-                                .customerName(customer.getClientName())
-                                .lastname(customer.getFirstName())
-                                .familyname(customer.getFamilyName())
+                                .customerName(dashIfBlank(customer.getClientName()))
+                                .lastname(dashIfBlank(customer.getFirstName()))
+                                .familyname(dashIfBlank(customer.getFamilyName()))
                                 .isForeign(0)
                                 .birthdate(customer.getBirthDate())
                                 .address(buildAddress(customer))
-                                .phone(firstNotBlank(customer.getMobile(), customer.getPhone1()))
+                                .phone(dashIfBlank(firstNotBlank(customer.getMobile(), customer.getPhone1())))
                                 .email(customer.getEmail() == null || customer.getEmail().isBlank()
                                                 ? "nomail@gmail.com"
                                                 : customer.getEmail())
@@ -507,35 +514,61 @@ public class RecentlyDataService {
         }
 
         /**
-         * Хаягийг TBCUSTOMERS-ийн задалсан багануудаас (AIMAGCITYNAME, ...CODE г.м) бүрдүүлнэ. Эдгээр нь
-         * хоосон бол (TBCLIENTS-ээс миграцлагдсан хуучин мөрүүдэд) ADDRESS1-ийг regex-ээр задална.
-         * Протоколын 2.2-2.8 талбарууд заавал тул кодууд бөглөгдөөгүй бол ЗМС VAE1004/VAE1008/VAE1012
-         * алдаа буцаана — тэдгээрийг "Харилцагчийн бүртгэл" цонхоор нөхнө.
+         * Хаягийг зөвхөн TBCUSTOMERS-ийн задалсан багануудаас бүрдүүлнэ. Код нь ХУР (*_XYP) код бөгөөд бүртгэх үед
+         * (CustomerService) болон миграцлагдсан мөрүүдэд эхлэх үед (CustomerAddressBackfill) хадгалагдсан байна.
+         * Хоосон текст талбаруудыг "-"-ээр бөглөнө.
          */
         private CustomerAddress buildAddress(Customer customer) {
-                CustomerAddress.CustomerAddressBuilder address = CustomerAddress.builder()
-                                .addressFull(customer.getAddress1())
-                                .aimagCityName(customer.getAimagCityName())
-                                .aimagCityCode(customer.getAimagCityCode())
-                                .soumDistrictName(customer.getSoumDistrictName())
-                                .soumDistrictCode(customer.getSoumDistrictCode())
-                                .bagKhorooName(customer.getBagKhorooName())
-                                .bagKhorooCode(customer.getBagKhorooCode())
-                                .streetName(customer.getStreetName())
-                                .apartmentName(customer.getAddress2());
+                return CustomerAddress.builder()
+                                .addressFull(dashIfBlank(customer.getAddress1()))
+                                .aimagCityName(dashIfBlank(customer.getAimagCityName()))
+                                .aimagCityCode(dashIfBlank(customer.getAimagCityCode()))
+                                .soumDistrictName(dashIfBlank(customer.getSoumDistrictName()))
+                                .soumDistrictCode(dashIfBlank(customer.getSoumDistrictCode()))
+                                .bagKhorooName(dashIfBlank(customer.getBagKhorooName()))
+                                .bagKhorooCode(dashIfBlank(customer.getBagKhorooCode()))
+                                .streetName(dashIfBlank(customer.getStreetName()))
+                                .apartmentName(customer.getAddress2())
+                                .build();
+        }
 
-                boolean namesMissing = customer.getAimagCityName() == null || customer.getSoumDistrictName() == null
-                                || customer.getBagKhorooName() == null || customer.getStreetName() == null;
-                Matcher matcher = customer.getAddress1() == null ? null
-                                : ADDRESS_PATTERN.matcher(customer.getAddress1().trim());
-                if (namesMissing && matcher != null && matcher.matches()) {
-                        address.aimagCityName(matcher.group("aimag"))
-                                        .soumDistrictName(matcher.group("soum"))
-                                        .bagKhorooName(matcher.group("bag"))
-                                        .streetName(matcher.group("street"))
-                                        .apartmentName(matcher.group("apartment"));
+        /** ЗМС рүү илгээх үед эх сангаас олдоогүй заавал текст талбарыг "-"-ээр бөглөнө. */
+        private static String dashIfBlank(String value) {
+                return value == null || value.isBlank() ? MISSING : value;
+        }
+
+        /** ЗМС-ийн o_c_loan_contractno дор хаяж 10 тэмдэгт байх ёстой тул богино бол ард нь "0" нэмж 10 болгоно (ж: 47000011 → 4700001100). */
+        private static String contractNo(String value) {
+                if (value == null || value.isBlank()) {
+                        return value;
                 }
-                return address.build();
+                String trimmed = value.trim();
+                return trimmed.length() >= CONTRACT_NO_MIN_LENGTH ? trimmed
+                                : trimmed + "0".repeat(CONTRACT_NO_MIN_LENGTH - trimmed.length());
+        }
+
+        /**
+         * Зээлийн дуусах огноо: TBACCOUNTS.MatureDate, хоосон бол OpenDate дээр Term (сараар) нэмнэ.
+         * Аль нэг нь байхгүй бол null (JSON-д "-" болно).
+         */
+        private static LocalDate maturityDate(Account account) {
+                if (account.getMatureDate() != null) {
+                        return account.getMatureDate().toLocalDate();
+                }
+                if (account.getOpenDate() == null || account.getTerm() == null) {
+                        return null;
+                }
+                return account.getOpenDate().toLocalDate().plusMonths(account.getTerm());
+        }
+
+        /** ЗМС рүү илгээх мөнгөн дүн, хүүгийн утгыг таслалаас хойш 2 оронтой болгоно (ж: 100000.00). */
+        private static BigDecimal amount(BigDecimal value) {
+                return zeroIfNull(value).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        /** amount()-тэй ижил, текст талбарт; утга байхгүй бол null (JSON-д "-" болно). */
+        private static String amountText(BigDecimal value) {
+                return value == null ? null : amount(value).toPlainString();
         }
 
         private static BigDecimal zeroIfNull(BigDecimal value) {
@@ -558,13 +591,10 @@ public class RecentlyDataService {
                                 .action("add")
                                 .dueDate(loanInstallment.getDueDate() == null ? null
                                                 : loanInstallment.getDueDate().toLocalDate().toString())
-                                .principal(loanInstallment.getPrincipal() == null ? null
-                                                : loanInstallment.getPrincipal().toString())
-                                .interest(loanInstallment.getInterest() == null ? null
-                                                : loanInstallment.getInterest().toString())
+                                .principal(amountText(loanInstallment.getPrincipal()))
+                                .interest(amountText(loanInstallment.getInterest()))
                                 .additional("0.00")
-                                .balance(loanInstallment.getAfterBalance() == null ? null
-                                                : loanInstallment.getAfterBalance().toString())
+                                .balance(amountText(loanInstallment.getAfterBalance()))
                                 .build();
         }
 
@@ -602,10 +632,8 @@ public class RecentlyDataService {
                                                 : loanInstallment.getCreatedOn()))
                                 .dueDate(loanInstallment.getDueDate() == null ? null
                                                 : loanInstallment.getDueDate().toLocalDate().toString())
-                                .principal(loanInstallment.getPrincipal() == null ? null
-                                                : loanInstallment.getPrincipal().toString())
-                                .interest(loanInstallment.getInterest() == null ? null
-                                                : loanInstallment.getInterest().toString())
+                                .principal(amountText(loanInstallment.getPrincipal()))
+                                .interest(amountText(loanInstallment.getInterest()))
                                 .additional("0.00")
                                 .build();
         }

@@ -1,6 +1,6 @@
 import { request, simulate } from "./client";
 import { usingDummyData } from "./config";
-import { CLIENT_TYPE_CITIZEN, type Customer, type CustomerRegistration } from "./types";
+import { CLIENT_TYPE_CITIZEN, type AddressMapping, type Customer, type CustomerRegistration } from "./types";
 
 const dummyCustomers: Customer[] = [
     {
@@ -62,4 +62,16 @@ export function updateCustomer(customerId: string, customer: CustomerRegistratio
         headers: userId ? { "X-User-Id": userId } : undefined,
         body: JSON.stringify(customer),
     });
+}
+
+/** GET /api/address-mapping - ApiController#getAddressMapping */
+export function getAddressMapping(): Promise<AddressMapping[]> {
+    if (usingDummyData) {
+        return simulate([
+            { cityCode: "11000", cityCodeXyp: "11", cityName: "Улаанбаатар", districtCode: "14000", districtCodeXyp: "19", districtName: "Сүхбаатар дүүрэг" },
+            { cityCode: "11000", cityCodeXyp: "11", cityName: "Улаанбаатар", districtCode: "13000", districtCodeXyp: "10", districtName: "Баянзүрх дүүрэг" },
+            { cityCode: "21000", cityCodeXyp: "21", cityName: "Дорнод аймаг", districtCode: "21001", districtCodeXyp: "01", districtName: "Хэрлэн сум" },
+        ]);
+    }
+    return request<AddressMapping[]>("/address-mapping");
 }
