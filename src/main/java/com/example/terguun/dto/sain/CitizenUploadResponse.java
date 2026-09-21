@@ -28,4 +28,9 @@ public class CitizenUploadResponse {
     @JsonProperty("action")
     private String action;
 
+    // RTE1017 үед Sain аль талбар шаардлага хангаагүйг "validate" объектоор буцаадаг: {"<талбарын зам>": "<алдааны код>"}.
+    @JsonProperty("validate")
+    @JsonDeserialize(using = FlexibleStringArrayDeserializer.class)
+    private String[] validate;
+
 }

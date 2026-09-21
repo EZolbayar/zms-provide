@@ -104,7 +104,7 @@ CREATE TABLE dbo.TBSAINUPLOADLOG (
     ENDPOINT           NVARCHAR(50)   NULL,
     PATCHNUMBER        NVARCHAR(50)   NULL,
     SUCCESS            BIT            NOT NULL,
-    ERRORMESSAGE       NVARCHAR(2000) NULL,
+    ERRORMESSAGE       NVARCHAR(MAX)  NULL,
     ACCOUNTMODIFIEDON  DATETIME2(3)   NULL,
     UPLOADEDON         DATETIME2(3)   NOT NULL,
     UPLOADEDBY         NVARCHAR(50)   NULL,
@@ -115,6 +115,10 @@ END;
 -- Жагсаалтаас хасах шүүлт нь (ACCOUNTID, CHANGETYPE, SUCCESS)-аар хайдаг тул индекс нэмнэ.
 IF OBJECT_ID(N'dbo.TBSAINUPLOADLOG', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_TBSAINUPLOADLOG_ACCOUNT' AND object_id = OBJECT_ID(N'dbo.TBSAINUPLOADLOG'))
 CREATE INDEX IX_TBSAINUPLOADLOG_ACCOUNT ON dbo.TBSAINUPLOADLOG (ACCOUNTID, CHANGETYPE, SUCCESS);
+
+-- Sain-ийн талбар бүрийн алдааны код (validate) 2000 тэмдэгтэд багтахгүй тул хуучин баганыг томруулна.
+IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.TBSAINUPLOADLOG') AND name = N'ERRORMESSAGE' AND max_length <> -1)
+ALTER TABLE dbo.TBSAINUPLOADLOG ALTER COLUMN ERRORMESSAGE NVARCHAR(MAX) NULL;
 
 
 -- Хаягийн лавлах (аймаг/хот, сум/дүүрэг). Харилцагч бүртгэх формын сонголт болон ЗМС рүү илгээх үеийн

@@ -1,5 +1,6 @@
 package com.example.terguun.repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,4 +14,8 @@ public interface SainUploadLogRepository extends JpaRepository<SainUploadLog, Lo
     List<SainUploadLog> findBySuccessTrueAndAccountIdIn(Collection<String> accountIds);
 
     List<SainUploadLog> findTop200ByOrderByUploadedOnDesc();
+
+    /** "Илгээлтийн лог" хуудсанд: [from, to) хугацааны илгээлтүүд, шинэ нь эхэндээ. */
+    List<SainUploadLog> findByUploadedOnGreaterThanEqualAndUploadedOnLessThanOrderByUploadedOnDesc(
+            LocalDateTime from, LocalDateTime to);
 }

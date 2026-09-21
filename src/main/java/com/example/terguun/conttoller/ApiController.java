@@ -1,7 +1,9 @@
 package com.example.terguun.conttoller;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.terguun.dto.AccountDto;
@@ -18,6 +21,7 @@ import com.example.terguun.dto.HttpResponse;
 import com.example.terguun.dto.Login;
 import com.example.terguun.dto.RecentCustomerData;
 import com.example.terguun.dto.RecentUploadItem;
+import com.example.terguun.dto.UploadLogDto;
 import com.example.terguun.dto.UploadRequest;
 import com.example.terguun.dto.sain.CitizenUploadResponse;
 import com.example.terguun.dto.sain.CustomerData;
@@ -28,6 +32,7 @@ import com.example.terguun.service.CustomerService;
 import com.example.terguun.service.LoginService;
 import com.example.terguun.service.RecentlyDataService;
 import com.example.terguun.service.SainUploadService;
+import com.example.terguun.service.UploadLogService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,6 +47,7 @@ public class ApiController {
     private final SainUploadService sainUploadService;
     private final CustomerService customerService;
     private final AddressMappingService addressMappingService;
+    private final UploadLogService uploadLogService;
 
     @PostMapping("/login")
     public ResponseEntity<HttpResponse<Login.Response>> login(@RequestBody Login.Request request) {
@@ -91,6 +97,14 @@ public class ApiController {
     @GetMapping("/address-mapping")
     public ResponseEntity<HttpResponse<List<AddressMapping>>> getAddressMapping() {
         return ResponseEntity.ok(HttpResponse.success(addressMappingService.getAll()));
+    }
+
+    /** Илгээлтийн лог: ЗМС рүү илгээсэн түүх, амжилттай/амжилтгүй. Огноо заагаагүй бол сүүлийн 7 хоног. */
+    @GetMapping("/upload-logs")
+    public ResponseEntity<HttpResponse<List<UploadLogDto>>> getUploadLogs(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return ResponseEntity.ok(HttpResponse.success(uploadLogService.getLogs(from, to)));
     }
 
     @GetMapping("/customers")
