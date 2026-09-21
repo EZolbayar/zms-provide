@@ -42,6 +42,9 @@ public class SainUploadService {
      */
     private static final AtomicLong PATCH_SEQUENCE = new AtomicLong(System.currentTimeMillis() * 100000L);
 
+    /** TBSAINUPLOADLOG.ERRORMESSAGE-д хадгалах дээд урт (багана нь NVARCHAR(MAX)). */
+    private static final int MAX_ERROR_LENGTH = 20000;
+
     private final SainServiceClient sainServiceClient;
     private final SainUploadLogRepository uploadLogRepository;
 
@@ -103,6 +106,11 @@ public class SainUploadService {
             boolean success = Boolean.TRUE.equals(response.getSuccess());
             if (!success) {
                 failureCount++;
+                // "Нийлүүлэх мэдээлэл" хуудас errors-ыг харуулдаг тул талбар бүрийн алдааг (validate) мөн нэгтгэнэ.
+                String errors = describeErrors(response);
+                if (errors != null) {
+                    response = response.toBuilder().errors(errors.split("\n")).validate(null).build();
+                }
             }
             responses.add(response);
             logs.add(toLog(payload, patchNumber, response, success, uploadedBy));
@@ -116,7 +124,7 @@ public class SainUploadService {
 
     private SainUploadLog toLog(SainUploadPayload payload, String patchNumber,
             CitizenUploadResponse response, boolean success, String uploadedBy) {
-        String errors = response.getErrors() == null ? null : String.join("; ", response.getErrors());
+        String errors = describeErrors(response);
         return SainUploadLog.builder()
                 .clientId(payload.clientId())
                 .accountId(payload.accountId())
@@ -125,11 +133,31 @@ public class SainUploadService {
                 .endpoint(payload.isEntity() ? entityPath : citizenPath)
                 .patchNumber(patchNumber)
                 .success(success)
-                .errorMessage(errors == null || errors.length() <= 2000 ? errors : errors.substring(0, 2000))
+                .errorMessage(errors == null || errors.length() <= MAX_ERROR_LENGTH ? errors : errors.substring(0, MAX_ERROR_LENGTH))
                 .accountModifiedOn(payload.accountModifiedOn())
                 .uploadedOn(LocalDateTime.now())
                 .uploadedBy(uploadedBy)
                 .build();
+    }
+
+    /**
+     * Хэрэглэгчид харуулах алдааны текст: Sain-ийн "errors" болон "validate" (талбар бүрийн алдааны код)-ыг
+     * мөр мөрөөр нь нэгтгэнэ. Талбарын замын "customer_data[0]." угтварыг хасаж уншихад хялбар болгоно.
+     */
+    private static String describeErrors(CitizenUploadResponse response) {
+        List<String> lines = new ArrayList<>();
+        if (response.getErrors() != null) {
+            // Sain алдааны кодыг "NaN" түлхүүртэйгээр буцаадаг ("NaN: RTE1017") тул угтварыг хасна.
+            for (String item : response.getErrors()) {
+                lines.add(item.replaceFirst("^NaN: ", ""));
+            }
+        }
+        if (response.getValidate() != null) {
+            for (String item : response.getValidate()) {
+                lines.add(item.replaceFirst("^customer_data\\[\\d+\\]\\.", ""));
+            }
+        }
+        return lines.isEmpty() ? null : String.join("\n", lines);
     }
 
     private CitizenUploadRequest citizenRequest(String patchNumber, CustomerData customer) {

@@ -216,3 +216,19 @@ export type AddressMapping = {
     bagkhorooCodeXyp?: string;
     bagkhorooName?: string;
 };
+
+/** com.example.terguun.dto.UploadLogDto - ЗМС рүү илгээсэн түүхийн нэг мөр (TBSAINUPLOADLOG) */
+export type UploadLog = {
+    logId: number;
+    uploadedOn?: string;
+    uploadedBy?: string;
+    clientId?: string;
+    customerName?: string;
+    accountId?: string;
+    changeType?: ChangeType;
+    customerType?: string;
+    endpoint?: string;
+    patchNumber?: string;
+    success?: boolean;
+    errorMessage?: string;
+};

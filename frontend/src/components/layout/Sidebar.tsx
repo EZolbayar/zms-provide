@@ -16,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
     { href: "/customers", label: "Харилцагчийн бүртгэл" },
     { href: "/accounts", label: "Дансны бүртгэл" },
     { href: "/citizen-upload", label: "Нийлүүлэх мэдээлэл" },
+    { href: "/upload-logs", label: "Илгээлтийн лог" },
 ];
 
 export function Sidebar({ user }: { user: Session | null }) {

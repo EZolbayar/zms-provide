@@ -6,6 +6,7 @@ import { login, logout } from "./auth";
 import { getAccounts } from "./accounts";
 import { getRecentChanges, uploadRecentChanges, getCustomersForClients, uploadCitizen } from "./citizen";
 import { createCustomer, getAddressMapping, getCustomer, getCustomers, updateCustomer } from "./customers";
+import { getUploadLogs } from "./uploadLogs";
 
 /** Single facade over every backend call, grouped to match com.example.terguun.conttoller.ApiController. */
 export const api = {
@@ -21,4 +22,5 @@ export const api = {
     createCustomer,
     updateCustomer,
     addressMapping: getAddressMapping,
+    uploadLogs: getUploadLogs,
 };
