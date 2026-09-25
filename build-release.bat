@@ -8,6 +8,17 @@ echo   ZMS bagts garah
 echo ==========================================================
 echo.
 
+rem "build-release.bat legacy" geheer huuchin SQL Server (2008 / 2008 R2)-d zoriulsan
+rem JDBC draiver (7.4)-tei bagts ugsarna. Argumentgui bol shine draiver (13.4).
+set "MVNPROFILE="
+set "DRIVERNOTE=SQL Server 2012+ (JDBC 13.4)"
+if /i "%~1"=="legacy" (
+  set "MVNPROFILE=-Plegacy-sqlserver"
+  set "DRIVERNOTE=SQL Server 2008 / 2008 R2 (JDBC 7.4)"
+)
+echo   Draiver: !DRIVERNOTE!
+echo.
+
 set "JDK=%JAVA_HOME%"
 if not exist "!JDK!\bin\jlink.exe" set "JDK=C:\Program Files\Amazon Corretto\jdk21.0.12_9"
 if not exist "!JDK!\bin\jlink.exe" goto :nojdk
@@ -26,7 +37,7 @@ robocopy "frontend\out" "src\main\resources\static" /mir /nfl /ndl /njh /njs /nc
 if errorlevel 8 goto :error
 
 echo [3/5] Backend package...
-call "%~dp0mvnw.cmd" -o clean package -DskipTests
+call "%~dp0mvnw.cmd" -o clean package -DskipTests !MVNPROFILE!
 if errorlevel 1 goto :error
 
 echo [4/5] Bagts ugsrah...
@@ -49,6 +60,8 @@ for %%F in ("target\*.war") do copy /y "%%F" "dist\ZMS\zms.jar" >nul
 if not exist "dist\ZMS\zms.jar" goto :nowar
 copy /y "libs\*.dll" "dist\ZMS\libs\" >nul
 copy /y "src\main\resources\application.properties" "dist\ZMS\config\application.properties" >nul
+copy /y "release\db.properties" "dist\ZMS\config\db.properties" >nul
+copy /y "release\legacy-tls.security" "dist\ZMS\config\legacy-tls.security" >nul
 copy /y "release\*.bat" "dist\ZMS\" >nul
 copy /y "release\*.txt" "dist\ZMS\" >nul
 

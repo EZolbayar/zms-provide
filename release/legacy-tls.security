@@ -1,0 +1,8 @@
+# ZMS: huuchin SQL Server (zovhon TLS 1.0 demjdeg) ruu holbogdohын tuld Java-giin TLS horigiig suluulna.
+# Zovhon ZMS-EHLUULEH.bat ene failyg -Djava.security.properties-eer ashiglana, busad programmd nuluulukhgui.
+# Java 21-iin anhdagch utgaas TLSv1, TLSv1.1, TLS_RSA_* -g hassan, busad horig hevree.
+# SQL Server-t TLS 1.2 shinechlel suulgasny daraa ene failyg ustgaj bolno.
+jdk.tls.disabledAlgorithms=SSLv3, DTLSv1.0, RC4, DES, \
+    MD5withRSA, DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL, \
+    ECDH, rsa_pkcs1_sha1 usage HandshakeSignature, \
+    ecdsa_sha1 usage HandshakeSignature, dsa_sha1 usage HandshakeSignature
