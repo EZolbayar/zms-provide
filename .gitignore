@@ -36,3 +36,5 @@ build/
 src/main/resources/static/
 frontend/out/
 dist/
+log.txt
+log.txt.*

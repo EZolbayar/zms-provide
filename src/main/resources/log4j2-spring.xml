@@ -4,17 +4,33 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level} [%thread] %logger{36} - %msg%n"/>
         </Console>
+        <!--
+            Хэрэглэгчийн компьютер дээр алдаа гарвал хар цонх хаагдчихаад мэдээлэл нь алга болдог.
+            Тиймээс бүх мессежийг log.txt файлд бас бичнэ. Файл 5 МБ болоход шинэ файл эхэлж,
+            хамгийн сүүлийн 3 файлыг хадгална. Байрлалыг -Dzms.log.file=... -ээр өөрчилж болно.
+        -->
+        <RollingFile name="File" fileName="${sys:zms.log.file:-log.txt}"
+                     filePattern="${sys:zms.log.file:-log.txt}.%i">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="3"/>
+        </RollingFile>
     </Appenders>
     <Loggers>
         <Logger name="com.example.zms_upload" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
         <!-- Logs the full Sain request/response bodies (Feign Logger.Level.FULL only emits at DEBUG). -->
         <Logger name="com.example.terguun.client.SainServiceClient" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
         <Root level="INFO">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Root>
     </Loggers>
 </Configuration>

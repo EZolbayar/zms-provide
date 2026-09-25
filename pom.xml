@@ -156,4 +156,19 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<!--
+			Хуучин SQL Server (2008 / 2008 R2) руу холбогдох багц угсрахад:
+			  build-release.bat legacy
+			Microsoft-ийн JDBC драйверийн 13.x нь SQL Server 2012-оос хойшхыг дэмждэг. Хуучин
+			сервер рүү холбогдоход нэвтэрсний дараа холболт тасардаг тул 7.4 драйверийг ашиглана.
+		-->
+		<profile>
+			<id>legacy-sqlserver</id>
+			<properties>
+				<mssql-jdbc.version>7.4.1.jre11</mssql-jdbc.version>
+			</properties>
+		</profile>
+	</profiles>
+
 </project>
